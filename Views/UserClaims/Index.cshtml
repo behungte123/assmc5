@@ -1,0 +1,258 @@
+@model IEnumerable<Microsoft.AspNetCore.Identity.IdentityUser>
+
+<div class="container-xxl py-5">
+    <div class="page-shell">
+
+        <!-- Header -->
+        <div class="page-head">
+            <div>
+                <h1 class="page-title">Quản trị nhân sự</h1>
+                <p class="page-subtitle">User & Role Management</p>
+            </div>
+
+            <div class="search-box">
+                <svg class="icon" viewBox="0 0 24 24" fill="none">
+                    <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z"
+                          stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M16.5 16.5 21 21"
+                          stroke="currentColor" stroke-width="1.8"
+                          stroke-linecap="round"/>
+                </svg>
+                <input class="search-input" placeholder="Tìm theo email (UI)..." />
+            </div>
+        </div>
+
+        <!-- Table Card -->
+        <div class="data-card">
+            <div class="table-responsive">
+                <table class="table data-table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Tài khoản</th>
+                            <th>ID hệ thống</th>
+                            <th class="text-end">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model)
+                        {
+                            var letter = (user.Email ?? "?")
+                                .Substring(0, 1).ToUpper();
+
+                            <tr>
+                                <td>
+                                    <div class="user-cell">
+                                        <div class="avatar">@letter</div>
+                                        <div>
+                                            <div class="user-email">@user.Email</div>
+                                            <div class="user-hint">Tài khoản hệ thống</div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <code class="id-pill">@user.Id</code>
+                                </td>
+
+                                <td class="text-end">
+                                    <a asp-action="Manage"
+                                       asp-route-userId="@user.Id"
+                                       class="btn btn-primary-soft">
+                                        Phân quyền →
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-foot">
+                Tip: Ưu tiên độ tương phản cao + khoảng trắng rộng để dễ nhìn và “chuẩn admin”.
+            </div>
+        </div>
+
+    </div>
+</div>
+<style>
+    /* =========================
+   ENTERPRISE ADMIN 2026
+   Easy to read – No neon
+   ========================= */
+
+:root {
+    --bg: #0b1220;
+    --panel: #0f172a;
+    --border: rgba(255,255,255,.08);
+    --border-soft: #e2e8f0;
+    --text: #e6edf7;
+    --muted: #94a3b8;
+    --accent: #38bdf8;
+}
+
+/* Page background */
+body {
+    background:
+        radial-gradient(1000px 500px at 15% 10%, rgba(56,189,248,.15), transparent 55%),
+        radial-gradient(900px 400px at 85% 0%, rgba(99,102,241,.12), transparent 55%),
+        var(--bg);
+}
+
+/* Layout */
+.page-shell {
+    max-width: 1100px;
+    margin: auto;
+}
+
+/* Header */
+.page-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 20px;
+}
+
+.page-title {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.page-subtitle {
+    margin-top: 6px;
+    color: var(--muted);
+}
+
+/* Search */
+.search-box {
+    position: relative;
+    width: 340px;
+}
+
+.search-box .icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    color: var(--muted);
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px 12px 10px 38px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+}
+
+.search-input::placeholder {
+    color: var(--muted);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(56,189,248,.15);
+}
+
+/* Card */
+.data-card {
+    background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+    border-radius: 18px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+/* Table */
+.data-table thead th {
+    background: rgba(15,23,42,.95);
+    color: var(--muted);
+    font-weight: 600;
+    font-size: .85rem;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+}
+
+.data-table tbody tr {
+    background: #f8fafc;
+    transition: background .15s ease;
+}
+
+.data-table tbody tr:hover {
+    background: #f1f5f9;
+}
+
+.data-table td {
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border-soft);
+    color: #0f172a;
+}
+
+/* User */
+.user-cell {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    background: linear-gradient(135deg, #38bdf8, #6366f1);
+    color: #020617;
+}
+
+.user-email {
+    font-weight: 600;
+}
+
+.user-hint {
+    font-size: .85rem;
+    color: #64748b;
+}
+
+/* ID */
+.id-pill {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    padding: 6px 10px;
+    border-radius: 10px;
+    font-size: .85rem;
+    color: #334155;
+    font-family: ui-monospace, monospace;
+}
+
+/* Button */
+.btn-primary-soft {
+    background: #e0f2fe;
+    border: 1px solid #bae6fd;
+    color: #0369a1;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: .2s;
+}
+
+.btn-primary-soft:hover {
+    background: #bae6fd;
+    color: #075985;
+}
+
+/* Footer */
+.table-foot {
+    padding: 12px 18px;
+    background: rgba(15,23,42,.85);
+    color: var(--muted);
+    font-size: .85rem;
+}
+
+</style>

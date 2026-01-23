@@ -1,0 +1,186 @@
+﻿@model Lab4.Models.Order
+
+@{
+    ViewData["Title"] = "Đặt hàng thành công";
+}
+
+<style>
+    /* ===== WRAP ===== */
+    .order-success-wrap {
+        max-width: 900px;
+        margin: 40px auto 60px;
+        padding: 30px 34px 36px;
+        background: rgba(255,255,255,.78);
+        border-radius: 14px;
+        box-shadow: 0 18px 34px rgba(0,0,0,.14);
+    }
+
+    /* ===== HEADER ===== */
+    .order-success-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 28px;
+        font-weight: 800;
+        margin-bottom: 6px;
+    }
+
+    .order-success-sub {
+        color: rgba(0,0,0,.55);
+        margin-bottom: 22px;
+    }
+
+    /* ===== INFO ===== */
+    .order-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px 24px;
+        font-size: 15px;
+    }
+
+        .order-info strong {
+            color: rgba(0,0,0,.75);
+        }
+
+    .order-info-full {
+        grid-column: 1 / -1;
+    }
+
+    hr {
+        margin: 22px 0;
+        opacity: .15;
+    }
+
+    /* ===== TABLE ===== */
+    .order-table {
+        margin-top: 12px;
+        font-size: 15px;
+    }
+
+        .order-table thead th {
+            background: rgba(0,0,0,.05);
+            font-weight: 700;
+            border-bottom: none;
+        }
+
+        .order-table td,
+        .order-table th {
+            vertical-align: middle;
+        }
+
+    .text-right {
+        text-align: right;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    /* ===== TOTAL ===== */
+    .order-total-row td {
+        font-size: 18px;
+        font-weight: 800;
+        border-top: 2px solid rgba(0,0,0,.25);
+    }
+
+    /* ===== ACTION ===== */
+    .order-actions {
+        margin-top: 34px;
+        text-align: center;
+    }
+
+    .btn-continue {
+        display: inline-block;
+        padding: 10px 28px;
+        border-radius: 6px;
+        background: rgba(0,0,0,.75);
+        color: #fff;
+        font-weight: 700;
+        letter-spacing: .04em;
+        text-decoration: none;
+    }
+
+        .btn-continue:hover {
+            background: rgba(0,0,0,.9);
+            color: #fff;
+        }
+
+    /* ===== MOBILE ===== */
+    @@media (max-width: 720px) {
+        .order-info {
+            grid-template-columns: 1fr;
+        }
+
+        .order-success-wrap {
+            padding: 22px 20px 26px;
+            margin: 26px 14px 40px;
+        }
+    }
+</style>
+
+<div class="order-success-wrap">
+
+    <!-- HEADER -->
+    <div class="order-success-title">
+        🎉 Đặt hàng thành công
+    </div>
+    <div class="order-success-sub">
+        Mã đơn: <strong>#@Model.Id</strong>
+    </div>
+
+    <!-- INFO -->
+    <div class="order-info">
+        <div><strong>Khách hàng:</strong> @Model.FullName</div>
+        <div><strong>SĐT:</strong> @Model.Phone</div>
+
+        <div class="order-info-full">
+            <strong>Địa chỉ:</strong> @Model.Address, @Model.City
+        </div>
+
+        <div><strong>Thanh toán:</strong> @Model.PaymentMethod</div>
+        <div><strong>Trạng thái:</strong> @Model.Status</div>
+    </div>
+
+    <hr />
+
+    <!-- TABLE -->
+    <h4>Chi tiết đơn hàng</h4>
+
+    <table class="table order-table">
+        <thead>
+            <tr>
+                <th>Sản phẩm</th>
+                <th class="text-center">SL</th>
+                <th class="text-right">Đơn giá</th>
+                <th class="text-right">Thành tiền</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var i in Model.Items)
+            {
+                <tr>
+                    <td>@i.ProductName</td>
+                    <td class="text-center">@i.Quantity</td>
+                    <td class="text-right">@string.Format("{0:N0} ₫", i.UnitPrice)</td>
+                    <td class="text-right">@string.Format("{0:N0} ₫", i.LineTotal)</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr class="order-total-row">
+                <td colspan="3" class="text-right">Tổng cộng</td>
+                <td class="text-right">
+                    @string.Format("{0:N0} ₫", Model.Total)
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <!-- ACTION -->
+    <div class="order-actions">
+        <a asp-controller="Product" asp-action="Menu" class="btn-continue">
+            Tiếp tục mua hàng
+        </a>
+    </div>
+
+</div>

@@ -1,0 +1,425 @@
+﻿@model IEnumerable<Lab4.Models.Product>
+
+@{
+    ViewData["Title"] = "Home";
+}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"]</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <style>
+        :root {
+            --bgTop: #f4f0e6;
+            --bgBottom: #e7efe9;
+            --ink: #2c2c2c;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+            color: var(--ink);
+            background: radial-gradient(1200px 520px at 50% -140px, rgba(255,255,255,.92), rgba(255,255,255,0) 62%), linear-gradient(180deg, var(--bgTop) 0 40%, var(--bgBottom) 40% 100%);
+            overflow-x: hidden;
+        }
+
+        /* khung ngoài bo góc nhẹ */
+        .frame {
+            position: fixed;
+            inset: 18px;
+            border-radius: 18px;
+            pointer-events: none;
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,.06), 0 26px 60px rgba(0,0,0,.08);
+        }
+
+        .page {
+            min-height: 100vh;
+            padding: 26px 0 40px;
+            position: relative;
+        }
+
+        /* TOP BAR (GIỮ NGUYÊN) */
+        .topbar {
+            width: min(1220px, calc(100% - 64px));
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .avatar {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 10px 18px rgba(0,0,0,.12);
+            border: 2px solid rgba(255,255,255,.7);
+            background: #fff;
+            flex: 0 0 auto;
+        }
+
+            .avatar img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
+
+        .menu {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0,0,0,.20);
+        }
+
+            .menu a {
+                text-decoration: none;
+                color: rgba(0,0,0,.48);
+                letter-spacing: .09em;
+                font-size: 13px;
+            }
+
+            .menu .sep {
+                color: rgba(0,0,0,.26);
+            }
+
+        /* ===== HOME - OUR OFFERINGS ===== */
+
+        /* dải nền pattern xanh nhạt như ảnh */
+        .offers-band {
+            margin-top: 16px;
+            padding: 24px 0 34px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(180deg, rgba(230,237,233,.98) 0%, rgba(214,228,221,.98) 100%);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.65), inset 0 -1px 0 rgba(0,0,0,.06);
+        }
+
+        .offers-pattern {
+            position: absolute;
+            inset: 0;
+            opacity: .55;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='90' viewBox='0 0 140 90'%3E%3Cg fill='none' stroke='%23000000' stroke-opacity='.12' stroke-width='1.6'%3E%3Cpath d='M0 90c23 0 23-46 46-46s23 46 46 46 23-46 46-46'/%3E%3Cpath d='M0 90c23 0 23-30 46-30s23 30 46 30 23-30 46-30'/%3E%3Cpath d='M0 90c23 0 23-15 46-15s23 15 46 15 23-15 46-15'/%3E%3C/g%3E%3C/svg%3E");
+            background-size: 170px 110px;
+            background-repeat: repeat;
+            filter: blur(.15px);
+        }
+
+        /* tiêu đề OUR OFFERINGS kiểu outline */
+        .offers-title {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            font-weight: 900;
+            letter-spacing: .10em;
+            font-size: clamp(44px, 5.6vw, 78px);
+            line-height: 1;
+            text-transform: uppercase;
+            color: transparent;
+            -webkit-text-stroke: 3.1px rgba(0,0,0,.30);
+            text-shadow: 0 2px 0 rgba(255,255,255,.25), 0 10px 18px rgba(0,0,0,.10);
+            transform: translateY(-4px);
+        }
+
+            .offers-title::after {
+                content: attr(data-text);
+                position: absolute;
+                inset: 0;
+                text-align: center;
+                color: transparent;
+                -webkit-text-stroke: 1.5px rgba(255,255,255,.55);
+                transform: translateY(1px);
+                pointer-events: none;
+            }
+
+        /* khu vực cards */
+        .offers-wrap {
+            width: min(1120px, calc(100% - 64px));
+            margin: 18px auto 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .food-card {
+            height: 100%;
+            border-radius: 12px;
+            background: rgba(255,255,255,.72);
+            border: 1px solid rgba(0,0,0,.06);
+            box-shadow: 0 14px 26px rgba(0,0,0,.10);
+            overflow: hidden;
+        }
+
+            .food-card .inner {
+                display: grid;
+                grid-template-columns: 112px 1fr;
+                gap: 16px;
+                align-items: center;
+                padding: 16px 16px;
+            }
+
+        .food-thumb {
+            width: 98px;
+            height: 98px;
+            border-radius: 999px;
+            overflow: hidden;
+            box-shadow: 0 10px 16px rgba(0,0,0,.16);
+            border: 3px solid rgba(255,255,255,.75);
+            background: #fff;
+            margin-left: 6px;
+        }
+
+            .food-thumb img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
+
+        .food-name {
+            font-weight: 800;
+            font-size: 20px;
+            margin: 0 0 4px;
+            letter-spacing: .02em;
+        }
+
+        .food-desc {
+            margin: 0 0 10px;
+            color: rgba(0,0,0,.42);
+            font-size: 12.5px;
+            line-height: 1.35;
+            max-width: 420px;
+        }
+
+        .food-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .price {
+            font-weight: 700;
+            color: rgba(0,0,0,.50);
+            font-size: 13px;
+        }
+
+        .btn-cart {
+            border: 1px solid rgba(0,0,0,.35);
+            background: rgba(0,0,0,.56);
+            color: #fff;
+            padding: 7px 14px;
+            border-radius: 4px;
+            font-weight: 800;
+            letter-spacing: .02em;
+            font-size: 12px;
+            box-shadow: 0 10px 18px rgba(0,0,0,.12);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+            .btn-cart:hover {
+                background: rgba(0,0,0,.72);
+                color: #fff;
+            }
+
+        .continue-bottom {
+            text-align: center;
+            margin-top: 18px;
+        }
+
+            .continue-bottom a {
+                color: rgba(0,0,0,.42);
+                text-decoration: none;
+                font-size: 13px;
+            }
+
+                .continue-bottom a:hover {
+                    text-decoration: underline;
+                }
+
+        /* sparkle góc phải dưới (giữ template cảm giác) */
+        .sparkle {
+            position: absolute;
+            right: 34px;
+            bottom: 26px;
+            width: 56px;
+            height: 56px;
+            opacity: .28;
+            transform: rotate(12deg);
+            pointer-events: none;
+        }
+
+        @@media (max-width: 992px) {
+            .food-card .inner {
+                grid-template-columns: 96px 1fr;
+            }
+
+            .food-thumb {
+                width: 88px;
+                height: 88px;
+            }
+        }
+
+        @@media (max-width: 520px) {
+            .menu {
+                gap: 10px;
+            }
+
+                .menu a {
+                    font-size: 12px;
+                }
+
+            .offers-wrap {
+                width: calc(100% - 32px);
+            }
+
+            .food-card .inner {
+                grid-template-columns: 84px 1fr;
+                padding: 14px;
+                gap: 12px;
+            }
+
+            .food-thumb {
+                width: 78px;
+                height: 78px;
+                margin-left: 0;
+            }
+
+            .food-name {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="frame"></div>
+
+    <div class="page">
+        
+
+        <section class="offers-band" aria-label="Our Offerings">
+            <div class="offers-pattern"></div>
+
+            <div class="offers-title" data-text="BEST SELLER">BEST SELLER</div>
+
+            <div class="offers-wrap">
+                <div class="row g-4 mt-1">
+                    <div class="row g-4 mt-1">
+                        @foreach (var p in Model)
+                        {
+                            <div class="col-12 col-lg-4">
+                                <div class="food-card">
+                                    <div class="inner">
+                                        <div class="food-thumb">
+                                            <img src="@p.ImageUrl" alt="@p.Name" />
+                                        </div>
+                                        <div>
+                                            <h3 class="food-name">@p.Name</h3>
+                                            <p class="food-desc">@p.Description</p>
+                                            <div class="food-meta">
+                                                <div class="price">@p.PriceText</div>
+                                                <button type="button" class="btn-cart js-add" data-id="@p.Id">
+                                                    Add to Cart
+                                                </button>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+
+                </div>
+
+                <div class="continue-bottom">
+                    <a href="/Shop">Continue Shopping</a>
+                </div>
+            </div>
+        </section>
+
+        <svg class="sparkle" viewBox="0 0 64 64" aria-hidden="true">
+            <path fill="rgba(255,255,255,.9)" d="M32 6l4.2 16.4L52 26.7 35.8 31 32 47 28.2 31 12 26.7l15.8-4.3z" />
+            <path fill="rgba(255,255,255,.75)" d="M52 38l2.2 8.5L62 49l-7.8 2.1L52 60l-2-8.9L42 49l8-2.5z" />
+        </svg>
+    </div>
+    <form id="antiForgeryForm" style="display:none;">
+        @Html.AntiForgeryToken()
+    </form>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+<script>
+    (function () {
+        const tokenInput = document.querySelector('#antiForgeryForm input[name="__RequestVerificationToken"]');
+
+        async function addToCart(productId) {
+            const res = await fetch('/Cart/AddAjax', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                    'RequestVerificationToken': tokenInput ? tokenInput.value : ''
+                },
+                body: new URLSearchParams({ productId: productId, quantity: 1 })
+            });
+
+            if (!res.ok) {
+                let txt = '';
+                try { txt = await res.text(); } catch {}
+                throw new Error('Add failed: ' + res.status + ' ' + txt);
+            }
+            return await res.json();
+        }
+
+        function setBadge(totalQty) {
+            const badge = document.getElementById('cartBadge');
+            if (badge) badge.textContent = totalQty ?? 0;
+        }
+
+        document.addEventListener('click', async (e) => {
+            const btn = e.target.closest('.js-add');
+            if (!btn) return;
+
+            btn.disabled = true;
+            const oldText = btn.textContent;
+            btn.textContent = 'Adding...';
+
+            try {
+                const id = btn.getAttribute('data-id');
+                const data = await addToCart(id);
+
+                if (data && data.ok) {
+                    setBadge(data.totalQty);
+
+                    // feedback nhẹ nhàng (không chuyển trang)
+                    btn.textContent = 'Added ✓';
+                    setTimeout(() => { btn.textContent = oldText; }, 900);
+                } else {
+                    btn.textContent = oldText;
+                    alert(data?.message || 'Add to cart failed');
+                }
+            } catch (err) {
+                btn.textContent = oldText;
+                alert(err?.message || 'Add to cart failed');
+            } finally {
+                btn.disabled = false;
+            }
+        });
+    })();
+</script>
+
+
+
+</html>

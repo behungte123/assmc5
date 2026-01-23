@@ -1,0 +1,116 @@
+@{
+    Layout = null; // Chạy độc lập để tối ưu hiệu ứng hình ảnh
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SYSTEM FAILURE - ACCESS DENIED</title>
+    <style>
+        :root {
+            --primary-color: #00ff41; /* Matrix Green */
+            --error-color: #ff003c;   /* Cyberpunk Red */
+            --bg-color: #050505;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            text-transform: uppercase;
+        }
+
+        /* Hiệu ứng quét dòng của màn hình CRT cũ */
+        body::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        .container {
+            text-align: center;
+            z-index: 3;
+            padding: 40px;
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 0 20px var(--primary-color);
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        .glitch {
+            font-size: 5rem;
+            font-weight: bold;
+            position: relative;
+            color: var(--error-color);
+            text-shadow: 0.05em 0 0 rgba(255,0,0,.75), -0.025em -0.05em 0 rgba(0,255,0,.75), 0.025em 0.05em 0 rgba(0,0,255,.75);
+            animation: glitch 500ms infinite;
+        }
+
+        @@keyframes glitch {
+            0% { text-shadow: 0.05em 0 0 rgba(255,0,0,.75), -0.05em -0.025em 0 rgba(0,255,0,.75), -0.025em 0.05em 0 rgba(0,0,255,.75); }
+            14% { text-shadow: 0.05em 0 0 rgba(255,0,0,.75), -0.05em -0.025em 0 rgba(0,255,0,.75), -0.025em 0.05em 0 rgba(0,0,255,.75); }
+            15% { text-shadow: -0.05em -0.025em 0 rgba(255,0,0,.75), 0.025em 0.025em 0 rgba(0,255,0,.75), -0.05em -0.05em 0 rgba(0,0,255,.75); }
+            /* ... (animation continues) */
+            100% { text-shadow: -0.025em 0 0 rgba(255,0,0,.75), -0.025em -0.025em 0 rgba(0,255,0,.75), -0.025em -0.05em 0 rgba(0,0,255,.75); }
+        }
+
+        .terminal-text {
+            font-size: 1.2rem;
+            margin-top: 20px;
+            border-right: 2px solid var(--primary-color);
+            white-space: nowrap;
+            overflow: hidden;
+            width: 0;
+            animation: typing 3s steps(40, end) forwards;
+        }
+
+        @@keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        .btn-return {
+            margin-top: 30px;
+            display: inline-block;
+            padding: 10px 20px;
+            color: var(--bg-color);
+            background-color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .btn-return:hover {
+            background-color: var(--error-color);
+            box-shadow: 0 0 20px var(--error-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="glitch" data-text="403">403</div>
+        <div class="terminal-text">> TRUY CẬP BỊ TỪ CHỐI...</div>
+        <div class="terminal-text">> PHÁT HIỆN XÂM NHẬP TRÁI PHÉP...</div>
+        <div class="terminal-text">> THIẾU CLAIM: [REQUIRED_IDENTITY_PERMISSION]...</div>
+        <p style="color: #666; margin-top: 20px;">Hệ thống đã ghi lại địa chỉ IP của bạn.</p>
+        <a href="/" class="btn-return">QUAY LẠI TRANG CHỦ</a>
+    </div>
+
+    <script>
+        // Hiệu ứng âm thanh giả lập (không bắt buộc)
+        console.log("Security Alert: Unauthorized access attempt at " + new Date().toISOString());
+    </script>
+</body>
+</html>

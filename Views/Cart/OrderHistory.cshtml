@@ -1,0 +1,115 @@
+﻿@model List<Lab4.Models.Order>
+
+@{
+    ViewData["Title"] = "Lịch sử mua hàng";
+    var isLoggedIn = User.Identity?.IsAuthenticated == true;
+}
+
+<style>
+    .order-history-wrap {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 28px 32px;
+        background: rgba(255,255,255,.75);
+        border-radius: 14px;
+        box-shadow: 0 16px 30px rgba(0,0,0,.12);
+    }
+
+        .order-history-wrap h2 {
+            margin-bottom: 20px;
+            font-weight: 800;
+        }
+
+    .order-table th {
+        background: rgba(0,0,0,.05);
+    }
+
+    .badge {
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+    }
+
+    .badge-new {
+        background: #e3f2fd;
+        color: #1565c0;
+    }
+
+    .badge-done {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .badge-cancel {
+        background: #ffebee;
+        color: #c62828;
+    }
+</style>
+
+<div class="order-history-wrap">
+
+    <h2>🧾 Lịch sử mua hàng</h2>
+
+    @* ⚠️ CẢNH BÁO CHO KHÁCH VÃNG LAI *@
+    @if (!isLoggedIn)
+    {
+        <div class="alert alert-warning mb-3">
+            ⚠️ Bạn đang xem đơn hàng với tư cách <b>khách vãng lai</b>.<br />
+            Đơn hàng chỉ truy cập được trên <b>trình duyệt hiện tại</b>.
+            Nếu xoá cookie hoặc đổi thiết bị, bạn sẽ <b>mất quyền truy cập</b>.
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <p>Bạn chưa có đơn hàng nào.</p>
+    }
+    else
+    {
+        <table class="table order-table">
+            <thead>
+                <tr>
+                    <th>Mã đơn</th>
+                    <th>Ngày</th>
+                    <th>Thanh toán</th>
+                    <th>Trạng thái</th>
+                    <th class="text-end">Tổng tiền</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var o in Model)
+                {
+                    <tr>
+                        <td>#@o.Id</td>
+                        <td>@o.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@o.PaymentMethod</td>
+                        <td>
+                            @if (o.Status == "NEW")
+                            {
+                                <span class="badge badge-new">Mới</span>
+                            }
+                            else if (o.Status == "DONE")
+                            {
+                                <span class="badge badge-done">Hoàn tất</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-cancel">Huỷ</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            @string.Format("{0:N0} ₫", o.Total)
+                        </td>
+                        <td class="text-end">
+                            <a asp-action="Success" asp-route-id="@o.Id">
+                                Xem
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+</div>

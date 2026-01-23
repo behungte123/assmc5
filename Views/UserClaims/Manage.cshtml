@@ -1,0 +1,41 @@
+@using System.Security.Claims
+@model IList<Claim>
+
+<div class="container mt-5">
+    <div class="glass-panel p-5">
+        <h3 class="text-info mb-4">Phân quyền cho: <span class="text-warning">@ViewBag.UserName</span></h3>
+
+        <!-- Form thêm quyền mới -->
+        <form asp-action="AddClaim" method="post" class="row g-3 mb-5 p-3 border border-secondary rounded">
+            <input type="hidden" name="userId" value="@ViewBag.UserId" />
+            <div class="col-md-8">
+                <select name="claimType" class="form-select bg-dark text-light border-info">
+                    <option value="CreateProduct">Quyền Tạo Sản Phẩm (CreateProduct) [2]</option>
+                    <option value="Admin">Quyền Quản Trị (Admin) [3]</option>
+                    <option value="Sales">Quyền Kinh Doanh (Sales) [3]</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary w-100">Kích hoạt Claim</button>
+            </div>
+        </form>
+
+        <h4 class="text-light mb-3">Danh sách quyền hiện có:</h4>
+        <div class="list-group">
+            @foreach (var claim in Model) {
+                <div class="list-group-item bg-transparent border-secondary text-light d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong class="text-success">@claim.Type</strong> 
+                        <span class="ms-3 badge bg-secondary">Value: @claim.Value</span>
+                    </div>
+                    <form asp-action="RemoveClaim" method="post" onsubmit="return confirm('Thu hồi quyền này?')">
+                        <input type="hidden" name="userId" value="@ViewBag.UserId" />
+                        <input type="hidden" name="claimType" value="@claim.Type" />
+                        <input type="hidden" name="claimValue" value="@claim.Value" />
+                        <button type="submit" class="btn btn-sm btn-danger">Thu hồi</button>
+                    </form>
+                </div>
+            }
+        </div>
+    </div>
+</div>
