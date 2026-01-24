@@ -88,7 +88,11 @@ namespace lab4.Migrations
                     Tax = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Total = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    VnpTxnRef = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    VnpTransactionNo = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    VnpResponseCode = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    VnpPayDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {

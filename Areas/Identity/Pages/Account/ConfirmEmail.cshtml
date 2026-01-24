@@ -4,5 +4,67 @@
     ViewData["Title"] = "Confirm email";
 }
 
-<h1>@ViewData["Title"]</h1>
-<partial name="_StatusMessage" model="Model.StatusMessage" />
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap');
+
+    body {
+        margin: 0;
+        font-family: 'Montserrat', sans-serif;
+        background: #f6f5ef;
+    }
+
+    .confirm-bg {
+        min-height: 100vh;
+        background: repeating-radial-gradient( circle at 0 0, rgba(0,0,0,0.03) 0, rgba(0,0,0,0.03) 40px, transparent 40px, transparent 80px );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .confirm-card {
+        background: #fbfaf4;
+        border-radius: 22px;
+        padding: 40px 45px;
+        width: 420px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        text-align: center;
+    }
+
+    .confirm-title {
+        font-weight: 600;
+        letter-spacing: 4px;
+        font-size: 24px;
+        color: #9a9a95;
+        margin-bottom: 25px;
+    }
+
+    .status-wrapper {
+        font-size: 14px;
+        color: #666;
+        line-height: 1.7;
+    }
+
+        .status-wrapper a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+            .status-wrapper a:hover {
+                text-decoration: underline;
+            }
+</style>
+
+<div class="confirm-bg">
+    <div class="confirm-card">
+
+        <div class="confirm-title">
+            XÁC NHẬN EMAIL
+        </div>
+
+        <div class="status-wrapper">
+            <partial name="_StatusMessage" model="Model.StatusMessage" />
+        </div>
+
+    </div>
+</div>

@@ -4,20 +4,108 @@
     ViewData["Title"] = "Register confirmation";
 }
 
-<h1>@ViewData["Title"]</h1>
-@{
-    if (@Model.DisplayConfirmAccountLink)
-    {
-<p>
-    This app does not currently have a real email sender registered, see <a href="https://aka.ms/aspaccountconf">these docs</a> for how to configure a real email sender.
-    Normally this would be emailed: <a id="confirm-link" href="@Model.EmailConfirmationUrl">Click here to confirm your account</a>
-</p>
-    }
-    else
-    {
-<p>
-        Please check your email to confirm your account.
-</p>
-    }
-}
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap');
 
+    body {
+        margin: 0;
+        font-family: 'Montserrat', sans-serif;
+        background: #f6f5ef;
+    }
+
+    .confirm-bg {
+        min-height: 100vh;
+        background: repeating-radial-gradient( circle at 0 0, rgba(0,0,0,0.03) 0, rgba(0,0,0,0.03) 40px, transparent 40px, transparent 80px );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .confirm-card {
+        background: #fbfaf4;
+        border-radius: 22px;
+        padding: 40px 45px;
+        width: 460px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        text-align: center;
+    }
+
+    .confirm-title {
+        font-weight: 600;
+        letter-spacing: 4px;
+        font-size: 24px;
+        color: #9a9a95;
+        margin-bottom: 25px;
+    }
+
+    .confirm-text {
+        font-size: 14px;
+        color: #666;
+        line-height: 1.7;
+    }
+
+        .confirm-text a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+            .confirm-text a:hover {
+                text-decoration: underline;
+            }
+
+    .confirm-link {
+        display: inline-block;
+        margin-top: 15px;
+        padding: 10px 18px;
+        border-radius: 14px;
+        background: #333;
+        color: #fff !important;
+        letter-spacing: 1px;
+        font-size: 13px;
+    }
+
+        .confirm-link:hover {
+            background: #111;
+        }
+</style>
+
+<div class="confirm-bg">
+    <div class="confirm-card">
+
+        <div class="confirm-title">
+            XÁC NHẬN TÀI KHOẢN
+        </div>
+
+        @if (Model.DisplayConfirmAccountLink)
+        {
+            <div class="confirm-text">
+                <p>
+                    Ứng dụng hiện chưa cấu hình dịch vụ gửi email thực tế.
+                    <br />
+                    Xem hướng dẫn tại
+                    <a href="https://aka.ms/aspaccountconf" target="_blank">đây</a>.
+                </p>
+
+                <p>
+                    Thông thường link này sẽ được gửi qua email:
+                </p>
+
+                <a id="confirm-link"
+                   href="@Model.EmailConfirmationUrl"
+                   class="confirm-link">
+                    XÁC NHẬN TÀI KHOẢN
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="confirm-text">
+                <p>
+                    Vui lòng kiểm tra email để xác nhận tài khoản của bạn.
+                </p>
+            </div>
+        }
+
+    </div>
+</div>

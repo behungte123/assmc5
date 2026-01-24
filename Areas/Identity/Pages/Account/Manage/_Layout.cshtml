@@ -1,5 +1,5 @@
 ﻿@{
-    if (ViewData.TryGetValue("ParentLayout", out var parentLayout) && parentLayout !=  null)
+    if (ViewData.TryGetValue("ParentLayout", out var parentLayout) && parentLayout != null)
     {
         Layout = parentLayout.ToString();
     }
@@ -9,18 +9,109 @@
     }
 }
 
-<h1>Manage your account</h1>
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap');
 
-<div>
-    <h2>Change your account settings</h2>
-    <hr />
-    <div class="row">
-        <div class="col-md-3">
-            <partial name="_ManageNav" />
+    body {
+        margin: 0;
+        font-family: 'Montserrat', sans-serif;
+        background: #f6f5ef;
+    }
+
+    .manage-bg {
+        min-height: 100vh;
+        background: repeating-radial-gradient( circle at 0 0, rgba(0,0,0,0.03) 0, rgba(0,0,0,0.03) 40px, transparent 40px, transparent 80px );
+        padding: 60px 0;
+        display: flex;
+        justify-content: center;
+    }
+
+    .manage-card {
+        background: #fbfaf4;
+        border-radius: 22px;
+        width: 1000px;
+        padding: 40px 45px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    }
+
+    .manage-title {
+        font-weight: 600;
+        letter-spacing: 4px;
+        font-size: 26px;
+        color: #9a9a95;
+        margin-bottom: 10px;
+    }
+
+    .manage-subtitle {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 25px;
+    }
+
+    .manage-divider {
+        border-top: 1px solid #e5e5e0;
+        margin-bottom: 30px;
+    }
+
+    .manage-layout {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        gap: 35px;
+    }
+
+    /* NAV */
+    .manage-nav {
+        border-right: 1px solid #e5e5e0;
+        padding-right: 25px;
+    }
+
+        .manage-nav a {
+            display: block;
+            font-size: 14px;
+            color: #666;
+            text-decoration: none;
+            margin-bottom: 12px;
+        }
+
+            .manage-nav a.active {
+                font-weight: 500;
+                color: #333;
+            }
+
+            .manage-nav a:hover {
+                text-decoration: underline;
+            }
+
+    /* CONTENT */
+    .manage-content {
+        font-size: 14px;
+        color: #555;
+    }
+</style>
+
+<div class="manage-bg">
+    <div class="manage-card">
+
+        <div class="manage-title">
+            QUẢN LÝ TÀI KHOẢN
         </div>
-        <div class="col-md-9">
-            @RenderBody()
+
+        <div class="manage-subtitle">
+            Thay đổi thông tin và cài đặt bảo mật
         </div>
+
+        <div class="manage-divider"></div>
+
+        <div class="manage-layout">
+            <div class="manage-nav">
+                <partial name="_ManageNav" />
+            </div>
+
+            <div class="manage-content">
+                @RenderBody()
+            </div>
+        </div>
+
     </div>
 </div>
 

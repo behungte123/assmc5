@@ -1,64 +1,176 @@
 ﻿@page
 @model RegisterModel
+
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Đăng ký";
 }
 
-<h1>@ViewData["Title"]</h1>
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap');
 
-<div class="row">
-    <div class="col-md-4">
-        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <h2>Create a new account.</h2>
-            <hr />
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+    body {
+        margin: 0;
+        font-family: 'Montserrat', sans-serif;
+        background: #f6f5ef;
+    }
+
+    /* Background */
+    .register-bg {
+        min-height: 100vh;
+        background: repeating-radial-gradient( circle at 0 0, rgba(0,0,0,0.03) 0, rgba(0,0,0,0.03) 40px, transparent 40px, transparent 80px );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Card */
+    .register-card {
+        background: #fbfaf4;
+        border-radius: 22px;
+        padding: 40px 45px;
+        width: 420px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    }
+
+    /* Title */
+    .register-title {
+        text-align: center;
+        font-weight: 600;
+        letter-spacing: 3px;
+        margin-bottom: 30px;
+    }
+
+    /* Form rows */
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    /* Inputs */
+    .form-control {
+        border-radius: 14px;
+        border: 1px solid #ddd;
+        padding: 14px 15px;
+        font-size: 14px;
+    }
+
+    /* Checkbox */
+    .form-check {
+        margin-top: 10px;
+    }
+
+    /* Button */
+    .register-btn {
+        margin-top: 25px;
+        width: 100%;
+        border-radius: 14px;
+        background: #333;
+        color: #fff;
+        padding: 12px;
+        border: none;
+        font-weight: 500;
+        letter-spacing: 1px;
+    }
+
+        .register-btn:hover {
+            background: #111;
+        }
+
+    /* Links */
+    .register-links {
+        margin-top: 15px;
+        text-align: center;
+        font-size: 13px;
+    }
+
+        .register-links a {
+            color: #777;
+            text-decoration: none;
+        }
+
+            .register-links a:hover {
+                text-decoration: underline;
+            }
+
+    /* External */
+    .external-login button {
+        margin-top: 10px;
+        width: 100%;
+        border-radius: 12px;
+    }
+</style>
+
+<div class="register-bg">
+    <div class="register-card">
+
+        <div class="register-title">ĐĂNG KÝ TÀI KHOẢN</div>
+
+        <form id="registerForm"
+              asp-route-returnUrl="@Model.ReturnUrl"
+              method="post">
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
             <div class="form-floating mb-3">
-                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                <input asp-for="Input.Email"
+                       class="form-control"
+                       autocomplete="username"
+                       placeholder="Email" />
                 <label asp-for="Input.Email">Email</label>
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
             </div>
+
             <div class="form-floating mb-3">
-                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.Password">Password</label>
+                <input asp-for="Input.Password"
+                       class="form-control"
+                       autocomplete="new-password"
+                       placeholder="Password" />
+                <label asp-for="Input.Password">Mật khẩu</label>
                 <span asp-validation-for="Input.Password" class="text-danger"></span>
             </div>
+
             <div class="form-floating mb-3">
-                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
+                <input asp-for="Input.ConfirmPassword"
+                       class="form-control"
+                       autocomplete="new-password"
+                       placeholder="Confirm Password" />
+                <label asp-for="Input.ConfirmPassword">Xác nhận mật khẩu</label>
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
-            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+
+            <button id="registerSubmit" type="submit" class="register-btn">
+                ĐĂNG KÝ
+            </button>
         </form>
-    </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to register.</h3>
+
+        <div class="register-links">
+            <p>
+                Đã có tài khoản?
+                <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">
+                    Đăng nhập
+                </a>
+            </p>
+        </div>
+
+        @* ===== External Register (Google...) GIỮ NGUYÊN ===== *@
+        @if ((Model.ExternalLogins?.Count ?? 0) > 0)
+        {
             <hr />
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
+            <form asp-page="./ExternalLogin"
+                  asp-route-returnUrl="@Model.ReturnUrl"
+                  method="post"
+                  class="external-login">
+                @foreach (var provider in Model.ExternalLogins!)
                 {
-                    <div>
-                        <p>
-                            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
-                            about setting up this ASP.NET application to support logging in via external services</a>.
-                        </p>
-                    </div>
+                    <button type="submit"
+                            name="provider"
+                            value="@provider.Name">
+                        Đăng ký với @provider.DisplayName
+                    </button>
                 }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                }
-                            </p>
-                        </div>
-                    </form>
-                }
-            }
-        </section>
+            </form>
+        }
     </div>
 </div>
 

@@ -1,53 +1,144 @@
 ﻿@page
 @model ExternalLoginsModel
 @{
-    ViewData["Title"] = "Manage your external logins";
+    ViewData["Title"] = "External Logins";
     ViewData["ActivePage"] = ManageNavPages.ExternalLogins;
 }
 
-<partial name="_StatusMessage" for="StatusMessage" />
-@if (Model.CurrentLogins?.Count > 0)
-{
-    <h3>Registered Logins</h3>
-    <table class="table">
-        <tbody>
-            @foreach (var login in Model.CurrentLogins)
-            {
-                <tr>
-                    <td id="@($"login-provider-{login.LoginProvider}")">@login.ProviderDisplayName</td>
-                    <td>
-                        @if (Model.ShowRemoveButton)
-                        {
-                            <form id="@($"remove-login-{login.LoginProvider}")" asp-page-handler="RemoveLogin" method="post">
-                                <div>
-                                    <input asp-for="@login.LoginProvider" name="LoginProvider" type="hidden" />
-                                    <input asp-for="@login.ProviderKey" name="ProviderKey" type="hidden" />
-                                    <button type="submit" class="btn btn-primary" title="Remove this @login.ProviderDisplayName login from your account">Remove</button>
-                                </div>
-                            </form>
-                        }
-                        else
-                        {
-                            @: &nbsp;
-                        }
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-@if (Model.OtherLogins?.Count > 0)
-{
-    <h4>Add another service to log in.</h4>
-    <hr />
-    <form id="link-login-form" asp-page-handler="LinkLogin" method="post" class="form-horizontal">
-        <div id="socialLoginList">
-            <p>
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap');
+
+    body {
+        margin: 0;
+        font-family: 'Montserrat', sans-serif;
+        background: #f6f5ef;
+    }
+
+    .ext-bg {
+        min-height: 100vh;
+        background: repeating-radial-gradient( circle at 0 0, rgba(0,0,0,0.03) 0, rgba(0,0,0,0.03) 40px, transparent 40px, transparent 80px );
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .ext-card {
+        background: #fbfaf4;
+        border-radius: 22px;
+        padding: 40px 45px;
+        width: 520px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    }
+
+    .ext-title {
+        text-align: center;
+        font-weight: 600;
+        letter-spacing: 4px;
+        font-size: 24px;
+        color: #9a9a95;
+        margin-bottom: 30px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 25px;
+    }
+
+        table td {
+            padding: 12px 8px;
+            font-size: 14px;
+            color: #555;
+            border-bottom: 1px solid #e5e5e0;
+        }
+
+    .btn-soft {
+        border-radius: 12px;
+        background: #b9b9b4;
+        border: none;
+        color: white;
+        padding: 8px 14px;
+        font-size: 13px;
+        letter-spacing: 1px;
+    }
+
+        .btn-soft:hover {
+            background: #a8a8a3;
+        }
+
+    .add-title {
+        font-size: 14px;
+        font-weight: 500;
+        color: #666;
+        margin-bottom: 10px;
+    }
+
+    .external-btn {
+        width: 100%;
+        margin-top: 10px;
+        border-radius: 12px;
+        background: #333;
+        color: #fff;
+        border: none;
+        padding: 10px;
+        font-size: 13px;
+        letter-spacing: 1px;
+    }
+
+        .external-btn:hover {
+            background: #111;
+        }
+</style>
+
+<div class="ext-bg">
+    <div class="ext-card">
+
+        <div class="ext-title">LIÊN KẾT TÀI KHOẢN</div>
+
+        <partial name="_StatusMessage" for="StatusMessage" />
+
+        @if (Model.CurrentLogins?.Count > 0)
+        {
+            <table>
+                <tbody>
+                    @foreach (var login in Model.CurrentLogins)
+                    {
+                        <tr>
+                            <td>@login.ProviderDisplayName</td>
+                            <td style="text-align:right">
+                                @if (Model.ShowRemoveButton)
+                                {
+                                    <form asp-page-handler="RemoveLogin" method="post">
+                                        <input asp-for="@login.LoginProvider" name="LoginProvider" type="hidden" />
+                                        <input asp-for="@login.ProviderKey" name="ProviderKey" type="hidden" />
+                                        <button type="submit" class="btn-soft">
+                                            REMOVE
+                                        </button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        @if (Model.OtherLogins?.Count > 0)
+        {
+            <div class="add-title">Thêm phương thức đăng nhập</div>
+
+            <form asp-page-handler="LinkLogin" method="post">
                 @foreach (var provider in Model.OtherLogins)
                 {
-                    <button id="@($"link-login-button-{provider.Name}")" type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
+                    <button type="submit"
+                            class="external-btn"
+                            name="provider"
+                            value="@provider.Name">
+                        LIÊN KẾT @provider.DisplayName
+                    </button>
                 }
-            </p>
-        </div>
-    </form>
-}
+            </form>
+        }
+
+    </div>
+</div>
