@@ -1,6 +1,7 @@
 ﻿using lab4.Models;
 using Lab4.Data;
 using Lab4.Models;
+using Lab4.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -18,11 +19,13 @@ namespace Lab4.Controllers
         private const string SessionKey = "CART_SESSION_ID";
 
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IVnPayService _vnPayService;
 
-        public CartController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        public CartController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IVnPayService vnPayService)
         {
             _context = context;
-            _userManager = userManager; // ✅ OK
+            _userManager = userManager;
+            _vnPayService = vnPayService;
         }
         [HttpGet]
         public async Task<IActionResult> Checkout()
@@ -110,6 +113,11 @@ namespace Lab4.Controllers
 
             try
             {
+                // Xác định status dựa trên payment method
+                // BANK = VNPay (chuyển khoản online)
+                var isVnPayMethod = vm.PaymentMethod == "BANK";
+                var initialStatus = isVnPayMethod ? "PENDING_PAYMENT" : "NEW";
+
                 var order = new Order
                 {
                     UserId = IsLoggedIn ? GetUserId() : null,
@@ -126,7 +134,7 @@ namespace Lab4.Controllers
                     Subtotal = subtotal,
                     Tax = tax,
                     Total = total,
-                    Status = "NEW"
+                    Status = initialStatus
                 };
 
                 _context.Orders.Add(order);
@@ -147,10 +155,25 @@ namespace Lab4.Controllers
                 }
 
                 await _context.SaveChangesAsync();
-                _context.CartItems.RemoveRange(cart.Items);
-                await _context.SaveChangesAsync();
+
+                // Nếu là chuyển khoản (VNPay), không xóa cart ngay - chờ thanh toán thành công
+                if (!isVnPayMethod)
+                {
+                    _context.CartItems.RemoveRange(cart.Items);
+                    await _context.SaveChangesAsync();
+                }
 
                 await tx.CommitAsync();
+
+                // ===== BANK/VNPAY: Redirect đến cổng thanh toán =====
+                if (isVnPayMethod)
+                {
+                    var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1";
+                    var orderInfo = $"Thanh toán đơn hàng #{order.Id}";
+                    var paymentUrl = _vnPayService.CreatePaymentUrl(order.Id, total, orderInfo, ipAddress);
+                    return Redirect(paymentUrl);
+                }
+
                 return RedirectToAction(nameof(Success), new { id = order.Id });
             }
             catch
@@ -194,6 +217,108 @@ namespace Lab4.Controllers
                 return NotFound();
 
             return View(guestOrder);
+        }
+
+        // =========================
+        // VNPAY CALLBACK - Người dùng redirect về
+        // =========================
+        [HttpGet]
+        public async Task<IActionResult> VnPayReturn()
+        {
+            var result = _vnPayService.ValidateCallback(Request.Query);
+
+            if (!result.IsValid)
+            {
+                TempData["Error"] = result.Message;
+                return RedirectToAction(nameof(Checkout));
+            }
+
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id == result.OrderId);
+            if (order == null)
+            {
+                TempData["Error"] = "Không tìm thấy đơn hàng.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Cập nhật thông tin VNPay
+            order.VnpTxnRef = result.OrderId.ToString();
+            order.VnpTransactionNo = result.TransactionNo;
+            order.VnpResponseCode = result.ResponseCode;
+            order.VnpPayDate = result.PayDate;
+
+            if (result.IsSuccess)
+            {
+                order.Status = "PAID";
+
+                // Xóa cart sau khi thanh toán thành công
+                var cart = await GetOrCreateCartAsync();
+                if (cart.Items.Any())
+                {
+                    _context.CartItems.RemoveRange(cart.Items);
+                }
+
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Success), new { id = order.Id });
+            }
+            else
+            {
+                order.Status = "PAYMENT_FAILED";
+                await _context.SaveChangesAsync();
+
+                TempData["Error"] = $"Thanh toán thất bại: {result.Message}";
+                return View("VnPayResult", result);
+            }
+        }
+
+        // =========================
+        // VNPAY IPN - VNPay gọi server
+        // =========================
+        [HttpGet]
+        public async Task<IActionResult> VnPayIPN()
+        {
+            var result = _vnPayService.ValidateCallback(Request.Query);
+
+            if (!result.IsValid)
+            {
+                return Json(new { RspCode = "97", Message = "Invalid signature" });
+            }
+
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id == result.OrderId);
+            if (order == null)
+            {
+                return Json(new { RspCode = "01", Message = "Order not found" });
+            }
+
+            // Kiểm tra số tiền khớp
+            if (order.Total != result.Amount)
+            {
+                return Json(new { RspCode = "04", Message = "Invalid amount" });
+            }
+
+            // Kiểm tra trạng thái đơn hàng (tránh xử lý lại)
+            if (order.Status == "PAID")
+            {
+                return Json(new { RspCode = "02", Message = "Order already confirmed" });
+            }
+
+            // Cập nhật thông tin
+            order.VnpTxnRef = result.OrderId.ToString();
+            order.VnpTransactionNo = result.TransactionNo;
+            order.VnpResponseCode = result.ResponseCode;
+            order.VnpPayDate = result.PayDate;
+
+            if (result.IsSuccess)
+            {
+                order.Status = "PAID";
+            }
+            else
+            {
+                order.Status = "PAYMENT_FAILED";
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Json(new { RspCode = "00", Message = "Confirm Success" });
         }
 
 

@@ -51,6 +51,18 @@ namespace Lab4.Models
         // ===== META =====
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+        // ===== VNPAY INFO =====
+        [StringLength(50)]
+        public string? VnpTxnRef { get; set; }
+
+        [StringLength(50)]
+        public string? VnpTransactionNo { get; set; }
+
+        [StringLength(10)]
+        public string? VnpResponseCode { get; set; }
+
+        public DateTime? VnpPayDate { get; set; }
+
         // ===== QUAN HỆ =====
         public List<OrderItem> Items { get; set; } = new();
     }

@@ -44,6 +44,11 @@ builder.Services.Configure<EmailSettings>(
 
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 
+// ================= VNPAY =================
+builder.Services.Configure<Lab4.Models.VnPayConfig>(
+    builder.Configuration.GetSection("VnPay"));
+builder.Services.AddScoped<Lab4.Services.IVnPayService, Lab4.Services.VnPayService>();
+
     // Cấu hình Claims-Based Authorization [1], [4]
 builder.Services.AddAuthorization(options =>
 {
