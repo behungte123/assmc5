@@ -1,0 +1,13 @@
+﻿@model Lab4.Models.Product
+
+<h2>Ẩn sản phẩm</h2>
+
+<div class="alert alert-warning">
+    Bạn có chắc muốn ẩn <strong>@Model.Name</strong>?
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Ẩn</button>
+    <a asp-action="Index" class="btn btn-secondary">Huỷ</a>
+</form>

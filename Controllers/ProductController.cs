@@ -80,6 +80,94 @@ namespace Lab4.Controllers
 
             return View(products);
         }
+
+        // GET: Admin/Product
+        public async Task<IActionResult> QL_SP()
+        {
+            var products = await _context.Products
+                .OrderBy(p => p.SortOrder)
+                .ToListAsync();
+
+            return View(products);
+        }
+
+        // GET: Admin/Product/Create
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: Admin/Product/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Product product)
+        {
+            if (!ModelState.IsValid)
+                return View(product);
+
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Admin/Product/Edit/5
+        public async Task<IActionResult> Edit(int id)
+        {
+            var product = await _context.Products.FindAsync(id);
+            if (product == null) return NotFound();
+            return View(product);
+        }
+
+        // POST: Admin/Product/Edit
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, Product product)
+        {
+            if (id != product.Id) return NotFound();
+
+            if (!ModelState.IsValid)
+                return View(product);
+
+            _context.Products.Update(product);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Admin/Product/Delete/5
+        public async Task<IActionResult> Delete(int id)
+        {
+            var product = await _context.Products.FindAsync(id);
+            if (product == null) return NotFound();
+            return View(product);
+        }
+
+        // POST: Admin/Product/Delete (SOFT DELETE)
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var product = await _context.Products.FindAsync(id);
+            if (product == null) return NotFound();
+
+            product.IsActive = false; // 👈 soft delete
+            _context.Products.Update(product);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(QL_SP));
+        }
+
+        // POST: Admin/Product/ToggleActive
+        [HttpPost]
+        public async Task<IActionResult> ToggleActive(int id)
+        {
+            var product = await _context.Products.FindAsync(id);
+            if (product == null) return NotFound();
+
+            product.IsActive = !product.IsActive;
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(QL_SP));
+        }
     }
     
     }
