@@ -300,6 +300,18 @@
                 font-size: 18px;
             }
         }
+
+        .food-card.out-of-stock {
+            opacity: 0.45;
+            filter: grayscale(0.6);
+        }
+
+            .food-card.out-of-stock .btn-cart {
+                background: rgba(0,0,0,.25);
+                border-color: rgba(0,0,0,.2);
+                cursor: not-allowed;
+            }
+
     </style>
 </head>
 
@@ -319,27 +331,51 @@
                     <div class="row g-4 mt-1">
                         @foreach (var p in Model)
                         {
+                            var qty = p.Inventory?.Quantity ?? 0;
+                            var outOfStock = qty <= 0;
+
                             <div class="col-12 col-lg-4">
-                                <div class="food-card">
+                                <div class="food-card @(outOfStock ? "out-of-stock" : "")">
                                     <div class="inner">
                                         <div class="food-thumb">
                                             <img src="@p.ImageUrl" alt="@p.Name" />
                                         </div>
+
                                         <div>
                                             <h3 class="food-name">@p.Name</h3>
                                             <p class="food-desc">@p.Description</p>
-                                            <div class="food-meta">
-                                                <div class="price">@p.PriceText</div>
-                                                <button type="button" class="btn-cart js-add" data-id="@p.Id">
-                                                    Add to Cart
-                                                </button>
 
+                                            <div class="food-meta">
+                                                <div>
+                                                    <div class="price">@p.PriceText</div>
+
+                                                    @if (outOfStock)
+                                                    {
+                                                        <small class="text-danger fw-bold">
+                                                            ❌ Hết hàng
+                                                        </small>
+                                                    }
+                                                    else
+                                                    {
+                                                        <small class="text-muted">
+                                                            Còn lại: @qty phần
+                                                        </small>
+                                                    }
+                                                </div>
+
+                                                <button type="button"
+                                                        class="btn-cart js-add"
+                                                        data-id="@p.Id"
+                                                        @(outOfStock ? "disabled" : "")>
+                                                    @(outOfStock ? "Sold Out" : "Add to Cart")
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         }
+
                     </div>
 
 
@@ -390,7 +426,7 @@
 
         document.addEventListener('click', async (e) => {
             const btn = e.target.closest('.js-add');
-            if (!btn) return;
+            if (!btn || btn.disabled) return;
 
             btn.disabled = true;
             const oldText = btn.textContent;
@@ -402,10 +438,8 @@
 
                 if (data && data.ok) {
                     setBadge(data.totalQty);
-
-                    // feedback nhẹ nhàng (không chuyển trang)
                     btn.textContent = 'Added ✓';
-                    setTimeout(() => { btn.textContent = oldText; }, 900);
+                    setTimeout(() => btn.textContent = oldText, 900);
                 } else {
                     btn.textContent = oldText;
                     alert(data?.message || 'Add to cart failed');
@@ -419,6 +453,7 @@
         });
     })();
 </script>
+
 
 
 

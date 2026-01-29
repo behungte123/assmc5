@@ -99,12 +99,28 @@ namespace Lab4.Controllers
             if (!cart.Items.Any())
                 return RedirectToAction(nameof(Index));
 
-            // ✅ SERVER CALC (IMPORTANT)
+            // =========================
+            // CHECK INVENTORY (ANTI OVERSELL)
+            // =========================
+            foreach (var ci in cart.Items)
+            {
+                var inventory = await _context.Inventories
+                    .FirstOrDefaultAsync(i => i.ProductId == ci.ProductId);
+
+                if (inventory == null || inventory.Quantity < ci.Quantity)
+                {
+                    TempData["Error"] =
+                        $"{ci.Product?.Name ?? "Sản phẩm"} chỉ còn {inventory?.Quantity ?? 0} phần";
+                    return RedirectToAction(nameof(Checkout));
+                }
+            }
+
+            // =========================
+            // SERVER CALC
+            // =========================
             decimal subtotal = 0;
             foreach (var i in cart.Items)
-            {
                 subtotal += ParseVndToLong(i.UnitPriceText) * i.Quantity;
-            }
 
             decimal tax = 0;
             decimal total = subtotal + tax;
@@ -113,8 +129,7 @@ namespace Lab4.Controllers
 
             try
             {
-                // Xác định status dựa trên payment method
-                // BANK = VNPay (chuyển khoản online)
+                // BANK = VNPay
                 var isVnPayMethod = vm.PaymentMethod == "BANK";
                 var initialStatus = isVnPayMethod ? "PENDING_PAYMENT" : "NEW";
 
@@ -140,14 +155,18 @@ namespace Lab4.Controllers
                 _context.Orders.Add(order);
                 await _context.SaveChangesAsync();
 
+                // =========================
+                // ORDER ITEMS
+                // =========================
                 foreach (var ci in cart.Items)
                 {
                     var unit = ParseVndToLong(ci.UnitPriceText);
+
                     _context.OrderItems.Add(new OrderItem
                     {
                         OrderId = order.Id,
                         ProductId = ci.ProductId,
-                        ProductName = ci.Product.Name,
+                        ProductName = ci.Product!.Name,
                         UnitPrice = unit,
                         Quantity = ci.Quantity,
                         LineTotal = unit * ci.Quantity
@@ -156,21 +175,46 @@ namespace Lab4.Controllers
 
                 await _context.SaveChangesAsync();
 
-                // Nếu là chuyển khoản (VNPay), không xóa cart ngay - chờ thanh toán thành công
+                // =========================
+                // TRỪ TỒN KHO + CLEAR CART (COD)
+                // =========================
                 if (!isVnPayMethod)
                 {
+                    foreach (var ci in cart.Items)
+                    {
+                        var inventory = await _context.Inventories
+                            .FirstAsync(i => i.ProductId == ci.ProductId);
+
+                        if (inventory.Quantity < ci.Quantity)
+                            throw new Exception("Inventory not enough");
+
+                        inventory.Quantity -= ci.Quantity;
+                        inventory.UpdatedAt = DateTime.Now;
+
+                        _context.Inventories.Update(inventory);
+                    }
+
                     _context.CartItems.RemoveRange(cart.Items);
-                    await _context.SaveChangesAsync();
                 }
 
+                // ✅ SAVE DUY NHẤT 1 LẦN
+                await _context.SaveChangesAsync();
                 await tx.CommitAsync();
 
-                // ===== BANK/VNPAY: Redirect đến cổng thanh toán =====
+                // =========================
+                // VNPAY REDIRECT
+                // =========================
                 if (isVnPayMethod)
                 {
                     var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1";
                     var orderInfo = $"Thanh toán đơn hàng #{order.Id}";
-                    var paymentUrl = _vnPayService.CreatePaymentUrl(order.Id, total, orderInfo, ipAddress);
+                    var paymentUrl = _vnPayService.CreatePaymentUrl(
+                        order.Id,
+                        total,
+                        orderInfo,
+                        ipAddress
+                    );
+
                     return Redirect(paymentUrl);
                 }
 
@@ -179,9 +223,11 @@ namespace Lab4.Controllers
             catch
             {
                 await tx.RollbackAsync();
+                TempData["Error"] = "Có lỗi xảy ra khi đặt hàng. Vui lòng thử lại.";
                 return RedirectToAction(nameof(Checkout));
             }
         }
+
 
 
         [HttpGet]
@@ -570,13 +616,31 @@ namespace Lab4.Controllers
         {
             if (quantity < 1) quantity = 1;
 
-            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == productId && p.IsActive);
+            var product = await _context.Products
+                .Include(p => p.Inventory)
+                .FirstOrDefaultAsync(p => p.Id == productId && p.IsActive);
+
             if (product == null)
-                return NotFound(new { ok = false, message = "Product not found" });
+                return NotFound(new { ok = false, message = "Sản phẩm không tồn tại" });
+
+            if (product.Inventory == null || product.Inventory.Quantity <= 0)
+                return Json(new { ok = false, message = "Sản phẩm đã hết hàng" });
 
             var cart = await GetOrCreateCartAsync();
 
             var item = cart.Items.FirstOrDefault(i => i.ProductId == productId);
+            var currentQty = item?.Quantity ?? 0;
+
+            // ❌ vượt tồn kho
+            if (currentQty + quantity > product.Inventory.Quantity)
+            {
+                return Json(new
+                {
+                    ok = false,
+                    message = $"Chỉ còn {product.Inventory.Quantity} phần"
+                });
+            }
+
             if (item == null)
             {
                 item = new CartItem
@@ -599,9 +663,10 @@ namespace Lab4.Controllers
                 .Where(i => i.CartId == cart.Id)
                 .SumAsync(i => i.Quantity);
 
-            return Json(new { ok = true, message = "Added to cart", totalQty });
+            return Json(new { ok = true, totalQty });
         }
-        
+
+
         [HttpGet]
         public async Task<IActionResult> OrderHistory()
         {

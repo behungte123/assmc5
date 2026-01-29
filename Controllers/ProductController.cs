@@ -29,12 +29,14 @@ namespace Lab4.Controllers
         public async Task<IActionResult> Menu()
         {
             var products = await _context.Products
+                .Include(p => p.Inventory)
                 .Where(p => p.IsActive)
                 .OrderBy(p => p.SortOrder)
                 .ToListAsync();
 
             return View(products);
         }
+
 
         public async Task<IActionResult> Search(string? query, int? minPrice, int? maxPrice, string? sortBy)
         {
