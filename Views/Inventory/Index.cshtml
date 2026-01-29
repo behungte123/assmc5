@@ -1,0 +1,46 @@
+﻿@model IEnumerable<Lab4.Models.Inventory>
+
+@{
+    ViewData["Title"] = "Quản lý tồn kho";
+}
+
+<h2 class="mb-3">Quản lý tồn kho</h2>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
+        <tr>
+            <th>Sản phẩm</th>
+            <th>Giá</th>
+            <th>Tồn kho</th>
+            <th>Cập nhật</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var i in Model)
+        {
+            <tr>
+                <td>@i.Product?.Name</td>
+                <td>@i.Product?.PriceText</td>
+                <td>
+                    <span class="badge @(i.Quantity <= 5 ? "bg-danger" : "bg-success")">
+                        @i.Quantity
+                    </span>
+                </td>
+                <td>@i.UpdatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@i.Id"
+                       class="btn btn-sm btn-primary">
+                        Set
+                    </a>
+
+                    <a asp-action="AddStock" asp-route-id="@i.Id"
+                       class="btn btn-sm btn-success">
+                        + Nhập
+                    </a>
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,37 @@
+﻿@model Lab4.Models.Inventory
+
+@{
+    ViewData["Title"] = "Nhập thêm tồn kho";
+}
+
+<h2>Nhập thêm tồn kho</h2>
+
+<form method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <label class="form-label">Sản phẩm</label>
+        <input class="form-control" value="@Model.Product?.Name" disabled />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Tồn kho hiện tại</label>
+        <input class="form-control" value="@Model.Quantity" disabled />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Nhập thêm</label>
+        <input type="number"
+               name="addQuantity"
+               class="form-control"
+               min="1"
+               placeholder="Ví dụ: 20"
+               required />
+    </div>
+
+    <button type="submit" class="btn btn-success">
+        + Cộng thêm
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+</form>

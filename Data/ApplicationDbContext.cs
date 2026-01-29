@@ -16,14 +16,51 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<CartItem> CartItems => Set<CartItem>();
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+    public DbSet<Inventory> Inventories => Set<Inventory>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        builder.Entity<Order>()
-            .HasMany(o => o.Items)
-            .WithOne(i => i.Order)
-            .HasForeignKey(i => i.OrderId)
-            .OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<Inventory>()
+    .HasOne(i => i.Product)
+    .WithOne(p => p.Inventory)
+    .HasForeignKey<Inventory>(i => i.ProductId)
+    .OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<Inventory>()
+            .Property(x => x.UpdatedAt)
+            .HasDefaultValueSql("GETUTCDATE()");
+
+
+        builder.Entity<Inventory>().HasData(
+    new Inventory { Id = 1, ProductId = 1, Quantity = 50 },
+    new Inventory { Id = 2, ProductId = 2, Quantity = 40 },
+    new Inventory { Id = 3, ProductId = 3, Quantity = 35 },
+    new Inventory { Id = 4, ProductId = 4, Quantity = 20 },
+    new Inventory { Id = 5, ProductId = 5, Quantity = 25 },
+    new Inventory { Id = 6, ProductId = 6, Quantity = 10 }
+);
+
+
+
+        builder.Entity<Order>(e =>
+        {
+            e.Property(x => x.Subtotal).HasPrecision(18, 2);
+            e.Property(x => x.Tax).HasPrecision(18, 2);
+            e.Property(x => x.Total).HasPrecision(18, 2);
+
+            e.HasMany(o => o.Items)
+    .WithOne(i => i.Order)
+    .HasForeignKey(i => i.OrderId)
+    .OnDelete(DeleteBehavior.Cascade);
+        })
+    ;
+
+        builder.Entity<OrderItem>(e =>
+        {
+            e.Property(x => x.UnitPrice).HasPrecision(18, 2);
+            e.Property(x => x.LineTotal).HasPrecision(18, 2);
+        });
+
         builder.Entity<CartItem>()
         .HasOne(x => x.Cart)
         .WithMany(c => c.Items)

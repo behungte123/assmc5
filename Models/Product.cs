@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -36,5 +37,9 @@ namespace Lab4.Models
 
         [NotMapped]
         public string PriceText => $"{PriceVnd:N0} VND";
+        [ScaffoldColumn(false)]
+        [BindNever]
+        public Inventory? Inventory { get; set; }
+
     }
 }

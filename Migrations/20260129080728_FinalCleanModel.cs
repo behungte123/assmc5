@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace lab4.Migrations
 {
     /// <inheritdoc />
-    public partial class AddProductTableAndSeed : Migration
+    public partial class FinalCleanModel : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -84,9 +84,9 @@ namespace lab4.Migrations
                     Email = table.Column<string>(type: "nvarchar(120)", maxLength: 120, nullable: true),
                     Note = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true),
                     PaymentMethod = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
-                    Subtotal = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Tax = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Total = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Subtotal = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Tax = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Total = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     VnpTxnRef = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
@@ -232,9 +232,9 @@ namespace lab4.Migrations
                     OrderId = table.Column<int>(type: "int", nullable: false),
                     ProductId = table.Column<int>(type: "int", nullable: false),
                     ProductName = table.Column<string>(type: "nvarchar(120)", maxLength: 120, nullable: false),
-                    UnitPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    UnitPrice = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
-                    LineTotal = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    LineTotal = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -275,6 +275,27 @@ namespace lab4.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Inventories",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Inventories", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Inventories_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "Products",
                 columns: new[] { "Id", "Description", "ImageUrl", "IsActive", "Name", "PriceVnd", "SortOrder" },
@@ -286,6 +307,19 @@ namespace lab4.Migrations
                     { 4, "Spring pork, ibe nite shang, brown sugar, thai bean", "/images/foods/my_quang.png", true, "Mỳ Quảng", 50000, 4 },
                     { 5, "Mtring pork, iba porl evolving, be teli, jorani, mint, bean", "/images/foods/hu_tieu_nam_vang.png", true, "Hủ Tiếu Nam Vang", 50000, 5 },
                     { 6, "Mivined per, ha fra rtwong, basil, mint, bean", "/images/foods/com_tam.png", true, "Cơm Tấm", 90000, 6 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Inventories",
+                columns: new[] { "Id", "ProductId", "Quantity" },
+                values: new object[,]
+                {
+                    { 1, 1, 50 },
+                    { 2, 2, 40 },
+                    { 3, 3, 35 },
+                    { 4, 4, 20 },
+                    { 5, 5, 25 },
+                    { 6, 6, 10 }
                 });
 
             migrationBuilder.CreateIndex(
@@ -352,6 +386,12 @@ namespace lab4.Migrations
                 filter: "[UserId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Inventories_ProductId",
+                table: "Inventories",
+                column: "ProductId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_OrderItems_OrderId",
                 table: "OrderItems",
                 column: "OrderId");
@@ -382,6 +422,9 @@ namespace lab4.Migrations
 
             migrationBuilder.DropTable(
                 name: "CartItems");
+
+            migrationBuilder.DropTable(
+                name: "Inventories");
 
             migrationBuilder.DropTable(
                 name: "OrderItems");
