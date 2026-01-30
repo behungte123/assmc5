@@ -1,9 +1,8 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@using Lab4.Models   @* đổi cho đúng ApplicationUser của bạn *@
+@using Lab4.Models
 @using lab4.Models
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
-
 
 @{
     var title = ViewData["Title"] as string ?? "Lab4";
@@ -36,11 +35,13 @@
             overflow-x: hidden;
         }
 
+        /* FRAME */
         .frame {
             position: fixed;
             inset: 18px;
             border-radius: 18px;
             pointer-events: none;
+            z-index: 0;
             box-shadow: inset 0 0 0 1px rgba(0,0,0,.06), 0 26px 60px rgba(0,0,0,.08);
         }
 
@@ -48,80 +49,23 @@
             min-height: 100vh;
             padding: 26px 0 40px;
             position: relative;
+            z-index: 1;
         }
 
+        /* ================= TOPBAR ================= */
         .topbar {
-            width: min(1220px, calc(100% - 64px));
+            width: min(1100px, calc(100% - 64px));
             margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        /* ===== TẦNG TRÊN ===== */
+        .top-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        /* Search Bar Styles */
-        .search-bar {
-            display: flex;
-            align-items: center;
-            background: rgba(255,255,255,.85);
-            border: 1px solid rgba(0,0,0,.12);
-            border-radius: 24px;
-            padding: 6px 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,.06);
-            transition: all 0.3s ease;
-            margin-left: auto;
-            margin-right: 16px;
-        }
-
-        .search-bar:hover,
-        .search-bar:focus-within {
-            background: rgba(255,255,255,.95);
-            border-color: rgba(0,0,0,.22);
-            box-shadow: 0 6px 18px rgba(0,0,0,.10);
-        }
-
-        .search-bar input[type="text"] {
-            border: none;
-            outline: none;
-            background: transparent;
-            font-size: 13px;
-            padding: 6px 10px;
-            width: 180px;
-            color: var(--ink);
-            transition: width 0.3s ease;
-        }
-
-        .search-bar input[type="text"]::placeholder {
-            color: rgba(0,0,0,.40);
-        }
-
-        .search-bar:focus-within input[type="text"] {
-            width: 220px;
-        }
-
-        .search-bar button {
-            border: none;
-            background: rgba(0,0,0,.60);
-            color: #fff;
-            padding: 6px 14px;
-            border-radius: 18px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .search-bar button:hover {
-            background: rgba(0,0,0,.80);
-        }
-
-        .search-bar button svg {
-            width: 14px;
-            height: 14px;
         }
 
         .avatar {
@@ -129,51 +73,110 @@
             height: 46px;
             border-radius: 50%;
             overflow: hidden;
-            box-shadow: 0 10px 18px rgba(0,0,0,.12);
-            border: 2px solid rgba(255,255,255,.7);
             background: #fff;
-            flex: 0 0 auto;
+            border: 2px solid rgba(255,255,255,.7);
+            box-shadow: 0 10px 18px rgba(0,0,0,.12);
         }
 
             .avatar img {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
-                display: block;
             }
 
-        .menu {
+        .search-bar {
             display: flex;
             align-items: center;
-            gap: 18px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(0,0,0,.20);
+            gap: 8px;
+            background: rgba(255,255,255,.95);
+            border: 1px solid rgba(0,0,0,.12);
+            border-radius: 999px;
+            padding: 8px 14px;
+            box-shadow: 0 8px 20px rgba(0,0,0,.10);
         }
 
-            .menu a {
+            .search-bar input {
+                border: none;
+                outline: none;
+                background: transparent;
+                width: 220px;
+                font-size: 13px;
+                color: var(--ink);
+            }
+
+            .search-bar button {
+                border: none;
+                background: rgba(0,0,0,.65);
+                color: #fff;
+                padding: 6px 14px;
+                border-radius: 999px;
+                font-size: 12px;
+                font-weight: 600;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+                .search-bar button:hover {
+                    background: rgba(0,0,0,.85);
+                }
+
+        /* ===== MENU ===== */
+        .menu {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 18px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0,0,0,.18);
+            flex-wrap: wrap;
+        }
+
+            .menu a,
+            .menu button {
                 text-decoration: none;
+                background: none;
+                border: none;
                 color: rgba(0,0,0,.48);
                 letter-spacing: .09em;
                 font-size: 13px;
             }
 
+                .menu a.active {
+                    color: rgba(0,0,0,.85);
+                    font-weight: 700;
+                }
+
             .menu .sep {
-                color: rgba(0,0,0,.26);
+                color: rgba(0,0,0,.25);
             }
 
-            /* optional active state */
-            .menu a.active {
-                color: rgba(0,0,0,.72);
-                font-weight: 800;
+        .dropdown-menu {
+            border-radius: 12px;
+            padding: 8px 0;
+            z-index: 3000;
+        }
+
+        @@media (min-width: 992px) {
+            .dropdown:hover > .dropdown-menu {
+                display: block;
+            }
+        }
+
+        /* ===== MOBILE ===== */
+        @@media (max-width: 768px) {
+            .top-row {
+                flex-direction: column;
+                gap: 12px;
             }
 
-        @@media (max-width:520px) {
-            .menu {
-                gap: 10px;
+            .search-bar {
+                width: 100%;
             }
 
-                .menu a {
-                    font-size: 12px;
+                .search-bar input {
+                    width: 100%;
                 }
         }
     </style>
@@ -186,87 +189,68 @@
 
     <div class="page">
         <header class="topbar">
-            <div class="avatar" title="Avatar">
-                <img src="~/images/nen_home.png" alt="avatar" />
+
+            <!-- ===== TẦNG TRÊN ===== -->
+            <div class="top-row">
+                <div class="avatar">
+                    <img src="~/images/nen_home.png" alt="avatar" />
+                </div>
+
+                <form class="search-bar" action="/Product/Search" method="get">
+                    <input type="text" name="query" placeholder="Tìm món ăn..."
+                           value="@Context.Request.Query["query"]" />
+                    <button type="submit">
+                        🔍 Tìm
+                    </button>
+                </form>
             </div>
 
-            <!-- Search Bar -->
-            <form class="search-bar" action="/Product/Search" method="get">
-                <input type="text" name="query" placeholder="Tìm món ăn..." value="@Context.Request.Query["query"]" />
-                <button type="submit">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                    Tìm
-                </button>
-            </form>
+            <!-- ===== TẦNG DƯỚI ===== -->
+            <nav class="menu">
+                <a class="@(Context.Request.Path == "/" || Context.Request.Path.Value?.StartsWith("/Product/Index") == true ? "active" : "")" href="/Product/Index">HOME</a>
+                <span class="sep">|</span>
 
-            <nav class="menu" aria-label="Main navigation">
-                <a class="@(Context.Request.Path.Value?.StartsWith("/Product/Index") == true || Context.Request.Path.Value == "/" ? "active" : "")" href="/Product/Index">HOME</a><span class="sep">|</span>
-                <a class="@(Context.Request.Path.Value?.StartsWith("/Product/Menu") == true ? "active" : "")" href="/Product/Menu">MENU</a><span class="sep">|</span>
-                <a class="@(Context.Request.Path.Value?.StartsWith("/Cart") == true ? "active" : "")" href="/Cart/Index">CART</a><span id="cartBadge" class="badge rounded-pill text-bg-dark" style="vertical-align:middle;">
-                    0
-                </span><span class="sep">|</span>
-                
+                <a class="@(Context.Request.Path.Value?.StartsWith("/Product/Menu") == true ? "active" : "")" href="/Product/Menu">MENU</a>
+                <span class="sep">|</span>
 
-                <a class="@(Context.Request.Path.Value?.StartsWith("/Cart/OrderHistory") == true ? "active" : "")" href="/Cart/OrderHistory">ORDER HISTORY</a><span class="sep">|</span>
+                <a class="@(Context.Request.Path.Value?.StartsWith("/Cart") == true ? "active" : "")" href="/Cart/Index">CART</a>
+                <span id="cartBadge" class="badge rounded-pill text-bg-dark">0</span>
+                <span class="sep">|</span>
+
+                <a class="@(Context.Request.Path.Value?.StartsWith("/Cart/OrderHistory") == true ? "active" : "")" href="/Cart/OrderHistory">ORDER HISTORY</a>
+                <span class="sep">|</span>
+
                 <a class="@(Context.Request.Path.Value?.StartsWith("/Contact") == true ? "active" : "")" href="/Contact">CONTACT</a>
-
                 <span class="sep">|</span>
 
                 @if (SignInManager.IsSignedIn(User))
                 {
-                    <a class="@(Context.Request.Path.Value?.StartsWith("/Identity/Account/Manage") == true ? "active" : "")"
-                       href="/Identity/Account/Manage" title="Manage">
-                        @User.Identity?.Name
-                    </a>
-
+                    <a href="/Identity/Account/Manage">@User.Identity?.Name</a>
                     <span class="sep">|</span>
-
                     <form class="d-inline" asp-area="Identity" asp-page="/Account/Logout"
-                          asp-route-returnUrl="@Url.Action("Index", "Product", new { area = "" })"
-                          method="post">
+                          asp-route-returnUrl="@Url.Action("Index", "Product")" method="post">
                         @Html.AntiForgeryToken()
-                        <button type="submit"
-                                class="btn btn-link p-0 m-0 align-baseline"
-                                style="text-decoration:none; color: rgba(0,0,0,.48); letter-spacing:.09em; font-size:13px;">
-                            LOGOUT
-                        </button>
+                        <button type="submit" class="btn btn-link p-0">LOGOUT</button>
                     </form>
                 }
                 else
                 {
-                    <a class="@(Context.Request.Path.Value?.StartsWith("/Identity/Account/Login") == true ? "active" : "")"
-                       asp-area="Identity" asp-page="/Account/Login">
-                        LOGIN
-                    </a>
-
+                    <a asp-area="Identity" asp-page="/Account/Login">LOGIN</a>
                     <span class="sep">|</span>
-
-                    <a class="@(Context.Request.Path.Value?.StartsWith("/Identity/Account/Register") == true ? "active" : "")"
-                       asp-area="Identity" asp-page="/Account/Register">
-                        REGISTER
-                    </a>
-                }
-                @if (SignInManager.IsSignedIn(User))
-                {
-                    <span class="sep">|</span>
-
-                    <a class="@(Context.Request.Path.Value?.StartsWith("/GoodsReceipts") == true ? "active" : "")"
-                       href="/GoodsReceipts/Create">
-                        NHẬP KHO
-                    </a>
-
-                    <span class="sep">|</span>
-
-                    <a class="@(Context.Request.Path.Value?.StartsWith("/Inventory/Logs") == true ? "active" : "")"
-                       href="/Inventory/Logs">
-                        LỊCH SỬ KHO
-                    </a>
+                    <a asp-area="Identity" asp-page="/Account/Register">REGISTER</a>
                 }
 
-
+                <div class="dropdown">
+                    <a class="dropdown-toggle" data-bs-toggle="dropdown">QUẢN LÝ</a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow">
+                        <li><a class="dropdown-item" href="/Suppliers/Index">🏭 Nhà cung cấp</a></li>
+                        <li><a class="dropdown-item" href="/Product/QL_SP">📦 Sản phẩm</a></li>
+                        <li><a class="dropdown-item" href="/PurchaseOrders/Index">📝 Đơn mua</a></li>
+                        <li><a class="dropdown-item" href="/GoodsReceipts/Create">📥 Phiếu nhập</a></li>
+                        <li><a class="dropdown-item" href="/Inventory/Index">📊 Tồn kho</a></li>
+                        <li><a class="dropdown-item" href="/Inventory/Logs">📜 Lịch sử kho</a></li>
+                    </ul>
+                </div>
             </nav>
         </header>
 
@@ -274,19 +258,20 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        async function refreshCartBadge() {
+            try {
+                const res = await fetch('/Cart/Count', { cache: 'no-store' });
+                if (!res.ok) return;
+                const data = await res.json();
+                document.getElementById('cartBadge').textContent = data.totalQty ?? 0;
+            } catch { }
+        }
+
+        document.addEventListener('DOMContentLoaded', refreshCartBadge);
+    </script>
+
     @RenderSection("Scripts", required: false)
 </body>
-<script>
-    async function refreshCartBadge() {
-        try {
-            const res = await fetch('/Cart/Count', { cache: 'no-store' });
-            if (!res.ok) return;
-            const data = await res.json();
-            document.getElementById('cartBadge').textContent = data.totalQty ?? 0;
-        } catch { }
-    }
-
-    document.addEventListener('DOMContentLoaded', refreshCartBadge);
-</script>
-
 </html>

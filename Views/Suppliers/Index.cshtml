@@ -1,0 +1,27 @@
+﻿@model IEnumerable<lab4.Models.Supplier>
+
+<h2>Nhà cung cấp</h2>
+
+<a asp-action="Create" class="btn btn-primary mb-3">+ Thêm NCC</a>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Code</th>
+            <th>Tên</th>
+            <th>Email</th>
+            <th>Điện thoại</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var s in Model)
+        {
+            <tr>
+                <td>@s.Code</td>
+                <td>@s.Name</td>
+                <td>@s.Email</td>
+                <td>@s.Phone</td>
+            </tr>
+        }
+    </tbody>
+</table>

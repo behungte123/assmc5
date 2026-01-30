@@ -1,4 +1,5 @@
-﻿@model List<lab4.Models.InventoryLog>
+﻿@using lab4.Models
+@model IEnumerable<InventoryLog>
 
 <h2>Lịch sử kho</h2>
 
@@ -7,20 +8,20 @@
         <tr>
             <th>Sản phẩm</th>
             <th>Thay đổi</th>
-            <th>Tồn sau</th>
+            <th>Sau thay đổi</th>
             <th>Loại</th>
             <th>Thời gian</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var log in Model)
+        @foreach (var l in Model)
         {
             <tr>
-                <td>@log.Product.Name</td>
-                <td>@log.QuantityChange</td>
-                <td>@log.QuantityAfter</td>
-                <td>@log.ActionType</td>
-                <td>@log.CreatedAt</td>
+                <td>@l.Product.Name</td>
+                <td>@l.QuantityChange</td>
+                <td>@l.QuantityAfter</td>
+                <td>@l.ActionType</td>
+                <td>@l.CreatedAt</td>
             </tr>
         }
     </tbody>

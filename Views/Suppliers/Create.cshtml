@@ -1,0 +1,27 @@
+﻿@model lab4.Models.Supplier
+
+<h2>Thêm nhà cung cấp</h2>
+
+<form asp-action="Create" method="post">
+    <div class="mb-3">
+        <label>Mã NCC</label>
+        <input asp-for="Code" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Tên NCC</label>
+        <input asp-for="Name" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Email</label>
+        <input asp-for="Email" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Điện thoại</label>
+        <input asp-for="Phone" class="form-control" />
+    </div>
+
+    <button class="btn btn-success">Lưu</button>
+</form>

@@ -1,0 +1,39 @@
+﻿@model lab4.Models.PurchaseOrder
+
+<h2>Chi tiết đơn mua</h2>
+
+<p><strong>Mã đơn:</strong> @Model.Code</p>
+<p><strong>Nhà cung cấp:</strong> @Model.Supplier.Name</p>
+<p><strong>Ngày đặt:</strong> @Model.OrderDate</p>
+<p><strong>Trạng thái:</strong> @Model.Status</p>
+
+<hr />
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Sản phẩm</th>
+            <th>Số lượng đặt</th>
+            <th>Giá</th>
+            <th>Đã nhận</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+                <td>@item.Product.Name</td>
+                <td>@item.QuantityOrdered</td>
+                <td>@item.UnitPrice</td>
+                <td>@item.QuantityReceived</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-controller="GoodsReceipts"
+   asp-action="Create"
+   asp-route-purchaseOrderId="@Model.Id"
+   class="btn btn-primary">
+    Nhập kho
+</a>

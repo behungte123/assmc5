@@ -1,0 +1,51 @@
+﻿@model IEnumerable<lab4.Models.PurchaseOrder>
+
+<h2>Danh sách đơn đặt hàng</h2>
+
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>Mã đơn</th>
+            <th>Nhà cung cấp</th>
+            <th>Ngày đặt</th>
+            <th>Trạng thái</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var po in Model)
+        {
+            <tr>
+                <td>@po.Code</td>
+                <td>@po.Supplier.Name</td>
+                <td>@po.OrderDate.ToString("dd/MM/yyyy")</td>
+                <td>
+                    <span class="badge @(po.Status == "RECEIVED" ? "bg-success" : "bg-warning")">
+                        @po.Status
+                    </span>
+                </td>
+                <td>
+                    <a asp-action="Details"
+                       asp-route-id="@po.Id"
+                       class="btn btn-sm btn-info">
+                        Chi tiết
+                    </a>
+
+                    @if (po.Status != "RECEIVED")
+                    {
+                        <a asp-controller="GoodsReceipts"
+                           asp-action="Create"
+                           asp-route-purchaseOrderId="@po.Id"
+                           class="btn btn-sm btn-primary ms-1">
+                            Nhập kho
+                        </a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Create" class="btn btn-success">
+    + Tạo đơn mới
+</a>

@@ -1,42 +1,69 @@
-﻿@model lab4.Models.GoodsReceiptViewModel
+﻿@using Lab4.Models
+@model lab4.Models.PurchaseOrder
+
 @{
-    var products = ViewBag.Products as List<Product>;
+    var items = Model.Items.ToList();
 }
 
-<h2>Nhập kho</h2>
+<h2>Nhập kho – Đơn mua #@Model.Code</h2>
+<div asp-validation-summary="All" class="text-danger"></div>
 
 <form asp-action="Create" method="post">
-    <table class="table">
+    <input type="hidden" name="purchaseOrderId" value="@Model.Id" />
+
+    <table class="table table-bordered">
         <thead>
             <tr>
                 <th>Sản phẩm</th>
-                <th>Số lượng</th>
+                <th>SL đặt</th>
+                <th>Đã nhận</th>
+                <th>Nhập kho</th>
+                <th>Giá nhập</th>
             </tr>
         </thead>
         <tbody>
-            @for (int i = 0; i < products.Count; i++)
+            @for (int i = 0; i < items.Count; i++)
             {
+                var item = items[i];
                 <tr>
                     <td>
-                        <select name="Items[@i].ProductId" class="form-control">
-                            @foreach (var p in products)
-                            {
-                                <option value="@p.Id">@p.Name</option>
-                            }
-                        </select>
+                        @item.Product.Name
+                        <input type="hidden"
+                               name="items[@i].ProductId"
+                               value="@item.ProductId" />
                     </td>
+
+                    <!-- SL ĐẶT -->
+                    <td>@item.QuantityOrdered</td>
+
+                    <!-- ĐÃ NHẬN -->
+                    <td>@item.QuantityReceived</td>
+
+                    <!-- NHẬP LẦN NÀY -->
                     <td>
-                        <input name="Items[@i].Quantity"
-                               class="form-control"
+                        <input name="items[@i].Quantity"
                                type="number"
-                               min="1" />
+                               min="0"
+                               max="@(item.QuantityOrdered - item.QuantityReceived)"
+                               class="form-control"
+                               required />
+                    </td>
+
+                    <!-- GIÁ NHẬP -->
+                    <td>
+                        <input name="items[@i].UnitCost"
+                               value="@item.UnitPrice"
+                               type="number"
+                               step="0.01"
+                               class="form-control"
+                               required />
                     </td>
                 </tr>
             }
         </tbody>
     </table>
 
-    <button type="submit" class="btn btn-success">
+    <button class="btn btn-primary">
         Xác nhận nhập kho
     </button>
 </form>

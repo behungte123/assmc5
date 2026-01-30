@@ -2,6 +2,8 @@
 {
     public class GoodsReceiptViewModel
     {
+        public int PurchaseOrderId { get; set; }
+
         public List<GoodsReceiptItemVM> Items { get; set; } = new();
     }
 
@@ -9,6 +11,8 @@
     {
         public int ProductId { get; set; }
         public int Quantity { get; set; }
+        public decimal UnitCost { get; set; }
     }
+
 
 }
