@@ -1,0 +1,56 @@
+﻿@model Order
+
+<h2>Chi tiết đơn hàng #@Model.Id</h2>
+
+<p><b>Khách hàng:</b> @Model.FullName</p>
+<p><b>Điện thoại:</b> @Model.Phone</p>
+<p><b>Địa chỉ:</b> @Model.Address</p>
+<p>
+    <b>Trạng thái hiện tại:</b>
+    <span class="badge bg-warning">@Model.Status</span>
+</p>
+
+<hr />
+
+<h4>Sản phẩm</h4>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Tên</th>
+            <th>SL</th>
+            <th>Giá</th>
+            <th>Thành tiền</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+                <td>@item.ProductName</td>
+                <td>@item.Quantity</td>
+                <td>@item.UnitPrice.ToString("N0") đ</td>
+                <td>@item.LineTotal.ToString("N0") đ</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<hr />
+
+<h4>Cập nhật trạng thái</h4>
+
+<form asp-action="UpdateStatus" method="post">
+    <input type="hidden" name="id" value="@Model.Id" />
+
+    <select name="status" class="form-select w-25 mb-2">
+        <option value="Pending" selected="@("Pending" == Model.Status)">Pending</option>
+        <option value="Confirmed" selected="@("Confirmed" == Model.Status)">Confirmed</option>
+        <option value="Shipping" selected="@("Shipping" == Model.Status)">Shipping</option>
+        <option value="Completed" selected="@("Completed" == Model.Status)">Completed</option>
+        <option value="Cancelled" selected="@("Cancelled" == Model.Status)">Cancelled</option>
+    </select>
+
+    <button type="submit" class="btn btn-success">
+        Cập nhật
+    </button>
+</form>

@@ -131,7 +131,7 @@ namespace Lab4.Controllers
             {
                 // BANK = VNPay
                 var isVnPayMethod = vm.PaymentMethod == "BANK";
-                var initialStatus = isVnPayMethod ? "PENDING_PAYMENT" : "NEW";
+                var initialStatus = isVnPayMethod ? "PENDING_PAYMENT" : "Pending";
 
                 var order = new Order
                 {

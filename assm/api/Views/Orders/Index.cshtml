@@ -1,0 +1,35 @@
+﻿@model IEnumerable<Order>
+
+<h2>Quản lý đơn hàng</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Mã đơn</th>
+            <th>Khách hàng</th>
+            <th>Ngày tạo</th>
+            <th>Tổng tiền</th>
+            <th>Trạng thái</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var o in Model)
+        {
+            <tr>
+                <td>#@o.Id</td>
+                <td>@o.FullName</td>
+                <td>@o.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@o.Total.ToString("N0") đ</td>
+                <td>
+                    <span class="badge bg-info">@o.Status</span>
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@o.Id" class="btn btn-sm btn-primary">
+                        Xem
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

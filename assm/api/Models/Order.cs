@@ -45,7 +45,7 @@ namespace Lab4.Models
 
         // ===== TRẠNG THÁI =====
         [Required, StringLength(20)]
-        public string Status { get; set; } = "NEW";
+        public string Status { get; set; } = "Pending";
         // NEW / CONFIRMED / DELIVERING / DONE / CANCELLED
 
         // ===== META =====

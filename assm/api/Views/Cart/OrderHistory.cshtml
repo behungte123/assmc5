@@ -85,17 +85,31 @@
                         <td>@o.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
                         <td>@o.PaymentMethod</td>
                         <td>
-                            @if (o.Status == "NEW")
+                            @switch (o.Status)
                             {
-                                <span class="badge badge-new">Mới</span>
-                            }
-                            else if (o.Status == "DONE")
-                            {
-                                <span class="badge badge-done">Hoàn tất</span>
-                            }
-                            else
-                            {
-                                <span class="badge badge-cancel">Huỷ</span>
+                                case "Pending":
+                                    <span class="badge badge-new">Chờ xác nhận</span>
+                                    break;
+
+                                case "Confirmed":
+                                    <span class="badge badge-new">Đã xác nhận</span>
+                                    break;
+
+                                case "Shipping":
+                                    <span class="badge badge-new">Đang giao</span>
+                                    break;
+
+                                case "Completed":
+                                    <span class="badge badge-done">Hoàn tất</span>
+                                    break;
+
+                                case "Cancelled":
+                                    <span class="badge badge-cancel">Huỷ</span>
+                                    break;
+
+                                default:
+                                    <span class="badge badge-cancel">Không xác định</span>
+                                    break;
                             }
                         </td>
                         <td class="text-end">
