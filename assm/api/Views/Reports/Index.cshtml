@@ -1,0 +1,27 @@
+﻿<h2>📊 Báo cáo tổng hợp kinh doanh</h2>
+
+
+<div class="row mb-4">
+    <div class="col">💰 Doanh thu: <strong>@ViewBag.TotalRevenue.ToString("N0")</strong></div>
+    <div class="col">🧾 Đơn hàng: <strong>@ViewBag.TotalOrders</strong></div>
+    <div class="col">📦 Tồn kho: <strong>@ViewBag.TotalInventory</strong></div>
+</div>
+
+
+<canvas id="revenueChart"></canvas>
+<canvas id="topProductChart" class="mt-5"></canvas>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const revenueData = @Html.Raw(Json.Serialize(ViewBag.RevenueByDay));
+
+
+    new Chart(document.getElementById('revenueChart'), {
+    type: 'line',
+    data: {
+    labels: revenueData.map(x => x.date),
+    datasets: [{ data: revenueData.map(x => x.total) }]
+    }
+    });
+</script>
