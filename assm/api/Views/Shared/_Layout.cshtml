@@ -207,57 +207,106 @@
 
             <!-- ===== TẦNG DƯỚI ===== -->
             <nav class="menu">
-                <a class="@(Context.Request.Path == "/" || Context.Request.Path.Value?.StartsWith("/Product/Index") == true ? "active" : "")" href="/Product/Index">HOME</a>
+
+                <!-- PUBLIC -->
+                <a class="@(Context.Request.Path == "/" || Context.Request.Path.Value?.StartsWith("/Product/Index") == true ? "active" : "")"
+                   href="/Product/Index">HOME</a>
                 <span class="sep">|</span>
 
-                <a id="menuLink" href="/Product/Menu">MENU</a>
+                <a class="@(Context.Request.Path.Value?.StartsWith("/Product/Menu") == true ? "active" : "")"
+                   href="/Product/Menu">MENU</a>
                 <span class="sep">|</span>
 
-                <a class="@(Context.Request.Path.Value?.StartsWith("/Cart") == true ? "active" : "")" href="/Cart/Index">CART</a>
-                <span id="cartBadge" class="badge rounded-pill text-bg-dark">0</span>
+                <a class="@(Context.Request.Path.Value?.StartsWith("/Contact") == true ? "active" : "")"
+                   href="/Contact">CONTACT</a>
                 <span class="sep">|</span>
 
-                <a class="@(Context.Request.Path.Value?.StartsWith("/Cart/OrderHistory") == true ? "active" : "")" href="/Cart/OrderHistory">ORDER HISTORY</a>
-                <span class="sep">|</span>
 
-                <a class="@(Context.Request.Path.Value?.StartsWith("/Reports/Index") == true ? "active" : "")" href="/Reports/Index">Reports</a>
-                <span class="sep">|</span>
+                <!-- CART – USER LOGIN -->
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <a class="@(Context.Request.Path.Value?.StartsWith("/Cart") == true ? "active" : "")"
+                       href="/Cart/Index">CART</a>
+                    <span id="cartBadge" class="badge rounded-pill text-bg-dark">0</span>
+                    <span class="sep">|</span>
 
-                <a class="@(Context.Request.Path.Value?.StartsWith("/Orders/Index") == true ? "active" : "")" href="/Orders/Index">Orders</a>
-                <span class="sep">|</span>
+                    <a class="@(Context.Request.Path.Value?.StartsWith("/Cart/OrderHistory") == true ? "active" : "")"
+                       href="/Cart/OrderHistory">ORDER HISTORY</a>
+                    <span class="sep">|</span>
+                }
 
-                <a class="@(Context.Request.Path.Value?.StartsWith("/Contact") == true ? "active" : "")" href="/Contact">CONTACT</a>
-                <span class="sep">|</span>
 
+                <!-- LOGIN / LOGOUT -->
                 @if (SignInManager.IsSignedIn(User))
                 {
                     <a href="/Identity/Account/Manage">@User.Identity?.Name</a>
                     <span class="sep">|</span>
-                    <form class="d-inline" asp-area="Identity" asp-page="/Account/Logout"
-                          asp-route-returnUrl="@Url.Action("Index", "Product")" method="post">
+
+                    <form class="d-inline"
+                          asp-area="Identity"
+                          asp-page="/Account/Logout"
+                          asp-route-returnUrl="@Url.Action("Index", "Product")"
+                          method="post">
                         @Html.AntiForgeryToken()
                         <button type="submit" class="btn btn-link p-0">LOGOUT</button>
                     </form>
+                    <span class="sep">|</span>
                 }
                 else
                 {
                     <a asp-area="Identity" asp-page="/Account/Login">LOGIN</a>
                     <span class="sep">|</span>
                     <a asp-area="Identity" asp-page="/Account/Register">REGISTER</a>
+                    <span class="sep">|</span>
                 }
 
-                <div class="dropdown">
-                    <a class="dropdown-toggle" data-bs-toggle="dropdown">QUẢN LÝ</a>
-                    <ul class="dropdown-menu dropdown-menu-end shadow">
-                        <li><a class="dropdown-item" href="/Suppliers/Index">🏭 Nhà cung cấp</a></li>
-                        <li><a class="dropdown-item" href="/Product/QL_SP">📦 Sản phẩm</a></li>
-                        <li><a class="dropdown-item" href="/PriceManagement/Index">📊 Giá </a></li>
-                        <li><a class="dropdown-item" href="/PurchaseOrders/Index">📝 Đơn mua</a></li>
-                        
-                        <li><a class="dropdown-item" href="/Inventory/Index">📊 Tồn kho</a></li>
-                        <li><a class="dropdown-item" href="/Inventory/Logs">📜 Lịch sử kho</a></li>
-                    </ul>
-                </div>
+
+                <!-- QUẢN LÝ – CÓ ÍT NHẤT 1 QUYỀN -->
+                @if (User.Identity != null && User.Identity.IsAuthenticated &&
+                                (
+                                User.HasClaim("Permission", "Admin.Access") ||
+                                User.HasClaim("Permission", "Product.Create") ||
+                                User.HasClaim("Permission", "Order.Manage") ||
+                                User.HasClaim("Permission", "Inventory.Manage")
+                                ))
+                {
+                    <div class="dropdown d-inline">
+                        <a class="dropdown-toggle" data-bs-toggle="dropdown">QUẢN LÝ</a>
+
+                        <ul class="dropdown-menu dropdown-menu-end shadow">
+
+                            @* ADMIN *@
+                            @if (User.HasClaim("Permission", "Admin.Access"))
+                            {
+                                <li><a class="dropdown-item" href="/Reports/Index">📊 Báo cáo</a></li>
+                                <li><a class="dropdown-item" href="/Suppliers/Index">🏭 Nhà cung cấp</a></li>
+                            }
+
+                            @* PRODUCT *@
+                            @if (User.HasClaim("Permission", "Product.Create"))
+                            {
+                                <li><a class="dropdown-item" href="/Product/QL_SP">📦 Sản phẩm</a></li>
+                                <li><a class="dropdown-item" href="/PriceManagement/Index">💲 Giá</a></li>
+                            }
+
+                            @* ORDER *@
+                            @if (User.HasClaim("Permission", "Order.Manage"))
+                            {
+                                <li><a class="dropdown-item" href="/Orders/Index">📝 Đơn bán</a></li>
+                                <li><a class="dropdown-item" href="/PurchaseOrders/Index">🧾 Đơn mua</a></li>
+                            }
+
+                            @* INVENTORY *@
+                            @if (User.HasClaim("Permission", "Inventory.Manage"))
+                            {
+                                <li><a class="dropdown-item" href="/Inventory/Index">📊 Tồn kho</a></li>
+                                <li><a class="dropdown-item" href="/Inventory/Logs">📜 Lịch sử kho</a></li>
+                            }
+
+                        </ul>
+                    </div>
+                }
+
             </nav>
         </header>
 

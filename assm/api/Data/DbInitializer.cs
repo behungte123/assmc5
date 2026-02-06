@@ -8,42 +8,43 @@ namespace Lab4.Data
     {
         public static async Task Initialize(UserManager<ApplicationUser> userManager)
         {
-            // 1. Tự động tạo và gán quyền cho Admin
-            string adminEmail = "admin@poly.edu.vn";
-            var adminUser = await userManager.FindByEmailAsync(adminEmail);
-
-            if (adminUser == null)
+            async Task EnsureUser(string email, string password, params string[] permissions)
             {
-                adminUser = new ApplicationUser { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true };
-                await userManager.CreateAsync(adminUser, "Admin@123"); // Tự động tạo user với mật khẩu mặc định
+                var user = await userManager.FindByEmailAsync(email);
+                if (user == null)
+                {
+                    user = new ApplicationUser
+                    {
+                        UserName = email,
+                        Email = email,
+                        EmailConfirmed = true
+                    };
+                    await userManager.CreateAsync(user, password);
+                }
+
+                var claims = await userManager.GetClaimsAsync(user);
+                foreach (var p in permissions)
+                {
+                    if (!claims.Any(c => c.Type == "Permission" && c.Value == p))
+                        await userManager.AddClaimAsync(user, new Claim("Permission", p));
+                }
             }
 
-            // Gán các Claim cho Admin theo yêu cầu [1], [3]
-            var adminClaims = await userManager.GetClaimsAsync(adminUser);
-            if (!adminClaims.Any(c => c.Type == "CreateProduct"))
-                await userManager.AddClaimAsync(adminUser, new Claim("CreateProduct", "true")); 
-            
-            if (!adminClaims.Any(c => c.Type == "Admin"))
-                await userManager.AddClaimAsync(adminUser, new Claim("Admin", "true")); 
+            await EnsureUser(
+                "admin@poly.edu.vn",
+                "Admin@123",
+                "Admin.Access",
+                "Product.Create",
+                "Inventory.Manage",
+                "Order.Manage"
+            );
 
-
-            // 2. Tự động tạo và gán quyền cho Sales (Nhân viên kinh doanh)
-            string salesEmail = "sales@poly.edu.vn";
-            var salesUser = await userManager.FindByEmailAsync(salesEmail);
-
-            if (salesUser == null)
-            {
-                salesUser = new ApplicationUser { UserName = salesEmail, Email = salesEmail, EmailConfirmed = true };
-                await userManager.CreateAsync(salesUser, "Sales@123"); // Tự động tạo user
-            }
-
-            // Gán các Claim cho Sales theo yêu cầu [1], [3]
-            var salesClaims = await userManager.GetClaimsAsync(salesUser);
-            if (!salesClaims.Any(c => c.Type == "Sales"))
-                await userManager.AddClaimAsync(salesUser, new Claim("Sales", "true")); 
-
-            if (!salesClaims.Any(c => c.Type == "CreateProduct"))
-                await userManager.AddClaimAsync(salesUser, new Claim("CreateProduct", "true")); 
+            await EnsureUser(
+                "sales@poly.edu.vn",
+                "Sales@123",
+                "Product.Create",
+                "Order.Manage"
+            );
         }
     }
 }

@@ -49,17 +49,20 @@ builder.Services.Configure<Lab4.Models.VnPayConfig>(
     builder.Configuration.GetSection("VnPay"));
 builder.Services.AddScoped<Lab4.Services.IVnPayService, Lab4.Services.VnPayService>();
 
-    // Cấu hình Claims-Based Authorization [1], [4]
+// Cấu hình Claims-Based Authorization [1], [4]
 builder.Services.AddAuthorization(options =>
 {
-    // Policy cho việc tạo sản phẩm [4], [2]
-    options.AddPolicy("CreateProductPolicy", policy => policy.RequireClaim("CreateProduct"));
+    options.AddPolicy("AdminOnly",
+        p => p.RequireClaim("Permission", "Admin.Access"));
 
-    // Policy dành cho Quản trị viên xem chi tiết [3]
-    options.AddPolicy("AdminViewProductPolicy", policy => policy.RequireClaim("Admin"));
+    options.AddPolicy("ManageProduct",
+        p => p.RequireClaim("Permission", "Product.Create"));
 
-    // Policy dành cho Nhân viên kinh doanh [3], [5]
-    options.AddPolicy("SalesViewProductPolicy", policy => policy.RequireClaim("Sales"));
+    options.AddPolicy("ManageInventory",
+        p => p.RequireClaim("Permission", "Inventory.Manage"));
+
+    options.AddPolicy("ManageOrder",
+        p => p.RequireClaim("Permission", "Order.Manage"));
 });
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();

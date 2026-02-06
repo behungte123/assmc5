@@ -1,9 +1,11 @@
 ﻿using Lab4.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace lab4.Controllers
 {
+    [Authorize(Policy = "AdminOnly")]
     public class ReportsController : Controller
     {
         private readonly ApplicationDbContext _context;
