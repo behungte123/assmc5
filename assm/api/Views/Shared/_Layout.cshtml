@@ -210,7 +210,7 @@
                 <a class="@(Context.Request.Path == "/" || Context.Request.Path.Value?.StartsWith("/Product/Index") == true ? "active" : "")" href="/Product/Index">HOME</a>
                 <span class="sep">|</span>
 
-                <a class="@(Context.Request.Path.Value?.StartsWith("/Product/Menu") == true ? "active" : "")" href="/Product/Menu">MENU</a>
+                <a id="menuLink" href="/Product/Menu">MENU</a>
                 <span class="sep">|</span>
 
                 <a class="@(Context.Request.Path.Value?.StartsWith("/Cart") == true ? "active" : "")" href="/Cart/Index">CART</a>
@@ -260,6 +260,20 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+              (function () {
+          const vueUrl = "http://localhost:5173/menu";
+
+          // thử load Vue bằng fetch nhẹ
+          fetch(vueUrl, { method: "HEAD", mode: "no-cors" })
+            .then(() => {
+              // nếu không throw → ưu tiên Vue
+              document.getElementById("menuLink").href = vueUrl;
+            })
+            .catch(() => {
+              // fail → giữ nguyên link MVC
+              console.warn("Vue not available, fallback to MVC");
+            });
+        })();
         async function refreshCartBadge() {
             try {
                 const res = await fetch('/Cart/Count', { cache: 'no-store' });
