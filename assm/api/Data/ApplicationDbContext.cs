@@ -23,6 +23,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<PurchaseOrderItem> PurchaseOrderItems => Set<PurchaseOrderItem>();
     public DbSet<GoodsReceipt> GoodsReceipts => Set<GoodsReceipt>();
     public DbSet<GoodsReceiptItem> GoodsReceiptItems => Set<GoodsReceiptItem>();
+    public DbSet<SupplierProduct> SupplierProducts => Set<SupplierProduct>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -154,5 +155,17 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                 SortOrder = 6
             }
         );
+        builder.Entity<SupplierProduct>()
+    .HasKey(sp => new { sp.SupplierId, sp.ProductId });
+
+        builder.Entity<SupplierProduct>()
+            .HasOne(sp => sp.Supplier)
+            .WithMany(s => s.SupplierProducts)
+            .HasForeignKey(sp => sp.SupplierId);
+
+        builder.Entity<SupplierProduct>()
+            .HasOne(sp => sp.Product)
+            .WithMany(p => p.SupplierProducts)
+            .HasForeignKey(sp => sp.ProductId);
     }
 }

@@ -107,8 +107,16 @@ namespace Lab4.Controllers
             if (!ModelState.IsValid)
                 return View(product);
 
+            // 👇 TẠO INVENTORY NGAY KHI TẠO PRODUCT
+            product.Inventory = new Inventory
+            {
+                Quantity = 0,
+                UpdatedAt = DateTime.UtcNow
+            };
+
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 

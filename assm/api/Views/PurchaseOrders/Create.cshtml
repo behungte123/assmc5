@@ -2,12 +2,16 @@
 @model PurchaseOrder
 
 <h2>Tạo đơn đặt hàng</h2>
+
 <div asp-validation-summary="All" class="text-danger"></div>
 
 <form asp-action="Create" method="post">
+
+    <!-- SUPPLIER -->
     <div class="mb-3">
         <label>Nhà cung cấp</label>
-        <select asp-for="SupplierId" class="form-select">
+        <select asp-for="SupplierId" class="form-select" id="supplierSelect">
+            <option value="">-- Chọn nhà cung cấp --</option>
             @foreach (var s in ViewBag.Suppliers)
             {
                 <option value="@s.Id">@s.Name</option>
@@ -17,33 +21,101 @@
 
     <h4>Danh sách hàng</h4>
 
-    <table class="table" id="items">
+    <table class="table">
         <thead>
             <tr>
                 <th>Sản phẩm</th>
                 <th>Số lượng</th>
                 <th>Giá nhập</th>
+                <th></th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="itemsBody">
             <tr>
                 <td>
-                    <select name="Items[0].ProductId" class="form-select">
-                        @foreach (var p in ViewBag.Products)
-                        {
-                            <option value="@p.Id">@p.Name</option>
-                        }
-                    </select>
+                    <select class="form-select productSelect"></select>
                 </td>
                 <td>
-                    <input name="Items[0].QuantityOrdered" type="number" class="form-control" />
+                    <input type="number" class="form-control quantity" />
                 </td>
                 <td>
-                    <input name="Items[0].UnitPrice" type="number" step="0.01" class="form-control" />
+                    <input type="number" step="0.01" class="form-control price" />
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm removeRow">X</button>
                 </td>
             </tr>
         </tbody>
     </table>
 
+    <button type="button" class="btn btn-primary mb-3" id="addRow">➕ Thêm hàng</button>
+    <br />
     <button class="btn btn-success">Tạo đơn</button>
 </form>
+
+@section Scripts {
+    <script>
+        const supplierSelect = document.getElementById("supplierSelect");
+        const tbody = document.getElementById("itemsBody");
+
+        // ===== ADD ROW =====
+        document.getElementById("addRow").addEventListener("click", addRow);
+
+        function addRow() {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td><select class="form-select productSelect"></select></td>
+                <td><input type="number" class="form-control quantity" /></td>
+                <td><input type="number" step="0.01" class="form-control price" /></td>
+                <td><button type="button" class="btn btn-danger btn-sm removeRow">X</button></td>
+            `;
+            tbody.appendChild(row);
+            reindex();
+            loadProducts();
+        }
+
+        // ===== REMOVE ROW =====
+        document.addEventListener("click", function (e) {
+            if (e.target.classList.contains("removeRow")) {
+                e.target.closest("tr").remove();
+                reindex();
+            }
+        });
+
+        // ===== REINDEX (VERY IMPORTANT) =====
+        function reindex() {
+            const rows = document.querySelectorAll("#itemsBody tr");
+            rows.forEach((row, i) => {
+                row.querySelector(".productSelect").name = `Items[${i}].ProductId`;
+                row.querySelector(".quantity").name = `Items[${i}].QuantityOrdered`;
+                row.querySelector(".price").name = `Items[${i}].UnitPrice`;
+            });
+        }
+
+        // ===== LOAD PRODUCTS =====
+        supplierSelect.addEventListener("change", loadProducts);
+
+        function loadProducts() {
+            const supplierId = supplierSelect.value;
+            if (!supplierId) return;
+
+            fetch(`/PurchaseOrders/GetProductsBySupplier?supplierId=${supplierId}`)
+                .then(res => res.json())
+                .then(data => {
+                    document.querySelectorAll(".productSelect").forEach(select => {
+                        const oldValue = select.value;
+                        select.innerHTML = '<option value="">-- Chọn sản phẩm --</option>';
+                        data.forEach(p => {
+                            select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+                        });
+                        select.value = oldValue;
+                    });
+                });
+        }
+
+        // ===== INIT =====
+        document.addEventListener("DOMContentLoaded", function () {
+            reindex();
+        });
+    </script>
+}

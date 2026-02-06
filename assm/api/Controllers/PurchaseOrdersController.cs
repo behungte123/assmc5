@@ -17,10 +17,28 @@ namespace lab4.Controllers
         public IActionResult Create()
         {
             ViewBag.Suppliers = _context.Suppliers.ToList();
-            ViewBag.Products = _context.Products.ToList();
-            return View();
+            return View(new PurchaseOrder
+            {
+                Items = new List<PurchaseOrderItem>
+        {
+            new PurchaseOrderItem()
         }
+            });
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetProductsBySupplier(int supplierId)
+        {
+            var products = await _context.SupplierProducts
+                .Where(sp => sp.SupplierId == supplierId)
+                .Select(sp => new
+                {
+                    id = sp.Product.Id,
+                    name = sp.Product.Name
+                })
+                .ToListAsync();
 
+            return Json(products);
+        }
         [HttpPost]
         public async Task<IActionResult> Create(PurchaseOrder po)
         {

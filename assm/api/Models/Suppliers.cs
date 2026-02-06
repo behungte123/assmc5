@@ -15,6 +15,8 @@
         public decimal? DefaultDiscount { get; set; }
 
         public ICollection<PurchaseOrder> PurchaseOrders { get; set; } = new List<PurchaseOrder>();
+        public ICollection<SupplierProduct> SupplierProducts { get; set; }
+           = new List<SupplierProduct>();
     }
 
 
