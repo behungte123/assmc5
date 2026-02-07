@@ -1,0 +1,43 @@
+﻿
+@using System.Security.Claims
+@using lab4.Models
+@model (ApplicationUser User, IList<Claim> Claims)
+
+<h2>🔑 Quản lý quyền</h2>
+
+<p><b>User:</b> @Model.User.Email</p>
+
+<h4>Quyền hiện có</h4>
+<ul>
+    @foreach (var claim in Model.Claims.Where(c => c.Type == "Permission"))
+    {
+        <li>
+            @claim.Value
+            <form method="post"
+                  asp-action="RemovePermission"
+                  class="d-inline">
+                <input type="hidden" name="userId" value="@Model.User.Id" />
+                <input type="hidden" name="permission" value="@claim.Value" />
+                <button class="btn btn-sm btn-danger">X</button>
+            </form>
+        </li>
+    }
+</ul>
+
+<hr />
+
+<h4>Thêm quyền</h4>
+
+@foreach (var p in ViewBag.AllPermissions as List<string>)
+{
+    if (!Model.Claims.Any(c => c.Type == "Permission" && c.Value == p))
+    {
+        <form method="post"
+              asp-action="AddPermission"
+              class="d-inline">
+            <input type="hidden" name="userId" value="@Model.User.Id" />
+            <input type="hidden" name="permission" value="@p" />
+            <button class="btn btn-sm btn-success">@p</button>
+        </form>
+    }
+}

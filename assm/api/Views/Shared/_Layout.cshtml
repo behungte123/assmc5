@@ -221,9 +221,9 @@
                    href="/Contact">CONTACT</a>
                 <span class="sep">|</span>
 
-
+                
                 <!-- CART – USER LOGIN -->
-                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                @*  @if (User.Identity != null && User.Identity.IsAuthenticated) *@
                 {
                     <a class="@(Context.Request.Path.Value?.StartsWith("/Cart") == true ? "active" : "")"
                        href="/Cart/Index">CART</a>
@@ -280,6 +280,7 @@
                             {
                                 <li><a class="dropdown-item" href="/Reports/Index">📊 Báo cáo</a></li>
                                 <li><a class="dropdown-item" href="/Suppliers/Index">🏭 Nhà cung cấp</a></li>
+                                <li><a class="dropdown-item" href="/Admin/Index">👑 Quản trị hệ thống</a></li>
                             }
 
                             @* PRODUCT *@

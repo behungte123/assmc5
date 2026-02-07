@@ -1,0 +1,48 @@
+﻿@using lab4.Models
+
+@model List<ApplicationUser>
+
+<h2>👥 Quản lý tài khoản</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>Trạng thái</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            var isLocked = user.LockoutEnd != null && user.LockoutEnd > DateTimeOffset.Now;
+
+            <tr>
+                <td>@user.Email</td>
+                <td>
+                    @if (isLocked)
+                    {
+                        <span class="text-danger">🔒 Bị khóa</span>
+                    }
+                    else
+                    {
+                        <span class="text-success">✔ Hoạt động</span>
+                    }
+                </td>
+                <td>
+                    <a class="btn btn-sm btn-primary"
+                       href="/Admin/Manage/@user.Id">Quyền</a>
+
+                    <form method="post"
+                          asp-action="ToggleLock"
+                          class="d-inline">
+                        <input type="hidden" name="userId" value="@user.Id" />
+                        <button class="btn btn-sm btn-warning">
+                            @(isLocked ? "Mở khóa" : "Khóa")
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
