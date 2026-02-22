@@ -68,6 +68,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHttpClient();
 // Session
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
@@ -127,11 +128,12 @@ app.UseSwagger();
 app.UseSwaggerUI();
 app.MapStaticAssets();
 
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Welcome}/{id?}")
     .WithStaticAssets();
-
+app.MapControllers();
 app.MapRazorPages()
    .WithStaticAssets();
 

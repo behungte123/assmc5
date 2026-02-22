@@ -342,7 +342,223 @@
 
         document.addEventListener('DOMContentLoaded', refreshCartBadge);
     </script>
+    <!-- CHATBOT WIDGET -->
+    <style>
+        :root {
+            --cow-primary: #6C4CF1;
+            --cow-secondary: #A78BFA;
+            --cow-bg: linear-gradient(135deg, #eef2ff, #f0fdfa);
+            --cow-dark: #1f1f1f;
+        }
 
+        /* Floating button */
+        #chat-toggle {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 26px;
+            color: white;
+            background: linear-gradient(135deg, var(--cow-primary), var(--cow-secondary));
+            box-shadow: 0 8px 25px rgba(108, 76, 241, 0.5);
+            transition: all 0.3s ease;
+            z-index: 9999;
+        }
+
+            #chat-toggle:hover {
+                transform: scale(1.1) rotate(8deg);
+            }
+
+        /* Chat box */
+        #chat-box {
+            position: fixed;
+            bottom: 110px;
+            right: 25px;
+            width: 370px;
+            height: 520px;
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(18px);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            animation: fadeInUp 0.4s ease;
+            z-index: 9999;
+        }
+
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Header */
+        .chat-header {
+            background: linear-gradient(135deg, var(--cow-primary), var(--cow-secondary));
+            color: white;
+            padding: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+            .chat-header span {
+                font-size: 14px;
+                opacity: 0.85;
+            }
+
+        /* Messages */
+        #chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background: var(--cow-bg);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .msg {
+            max-width: 75%;
+            padding: 10px 14px;
+            border-radius: 18px;
+            font-size: 14px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .user-msg {
+            align-self: flex-end;
+            background: var(--cow-primary);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bot-msg {
+            align-self: flex-start;
+            background: white;
+            color: var(--cow-dark);
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        /* Input */
+        #chat-input {
+            display: flex;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            background: white;
+        }
+
+            #chat-input input {
+                flex: 1;
+                border: none;
+                padding: 14px;
+                outline: none;
+                font-size: 14px;
+            }
+
+            #chat-input button {
+                border: none;
+                background: var(--cow-primary);
+                color: white;
+                padding: 0 18px;
+                font-weight: 600;
+                transition: 0.3s;
+            }
+
+                #chat-input button:hover {
+                    background: var(--cow-secondary);
+                }
+
+        /* Scrollbar đẹp */
+        #chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+        }
+    </style>
+
+    <button id="chat-toggle">🐄</button>
+
+    <div id="chat-box">
+        <div class="chat-header">
+            🐄 Bò Biết Bay AI
+            <span>Online • Trợ lý thông minh</span>
+        </div>
+
+        <div id="chat-messages">
+            <div class="msg bot-msg">
+                Xin chào! 🐄✨
+                Tôi là Bò Biết Bay – trợ lý của bạn hôm nay!
+            </div>
+        </div>
+
+        <div id="chat-input">
+            <input id="chat-text" placeholder="Hỏi Bò điều gì đó..." />
+            <button onclick="sendChat()">Gửi</button>
+        </div>
+    </div>
+
+    <script>
+        const toggle = document.getElementById("chat-toggle");
+        const box = document.getElementById("chat-box");
+        const messages = document.getElementById("chat-messages");
+
+        toggle.onclick = () => {
+            box.style.display =
+                box.style.display === "flex" ? "none" : "flex";
+        };
+
+                async function sendChat() {
+            const input = document.getElementById("chat-text");
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            messages.innerHTML += `<div class="msg user-msg">${msg}</div>`;
+            input.value = "";
+
+            const loading = document.createElement("div");
+            loading.className = "msg bot-msg";
+            loading.innerText = "Bò đang bay... 🐄💨";
+            messages.appendChild(loading);
+
+            try {
+                const res = await fetch("/Chat/Ask", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: msg })
+                });
+
+                if (!res.ok)
+                    throw new Error("Server error " + res.status);
+
+                const data = await res.json();
+
+                loading.remove();
+                messages.innerHTML += `<div class="msg bot-msg">${data.reply}</div>`;
+            }
+            catch (err) {
+                loading.innerText = "Lỗi kết nối server 😢";
+                console.error(err);
+            }
+
+            messages.scrollTop = messages.scrollHeight;
+        }
+    </script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>
